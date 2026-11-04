@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Fut Manager</title>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Fut Manager">
+<meta name="theme-color" content="#10201a">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pitch-dark: #10201a;
+    --pitch: #1b4332;
+    --pitch-light: #2d5a45;
+    --chalk: #f2f0e6;
+    --chalk-dim: #c8c4b4;
+    --clay: #c97b4a;
+    --clay-hover: #db8e5c;
+    --gold: #e8b84b;
+    --alert: #d64933;
+    --line: rgba(242,240,230,0.14);
+    --shadow: 0 10px 30px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    background:
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.02) 0 2px, transparent 2px 120px),
+      linear-gradient(180deg, var(--pitch-dark), #0b1712);
+    color:var(--chalk);
+    min-height:100vh;
+    padding:24px 16px 60px;
+  }
+  h1,h2,h3{font-family:'Oswald',sans-serif; margin:0; letter-spacing:0.02em;}
+  .wrap{max-width:720px;margin:0 auto;}
+  .eyebrow{
+    font-family:'Oswald',sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.18em;
+    font-size:12px;
+    color:var(--gold);
+    margin-bottom:4px;
+  }
+  .title{font-size:28px;font-weight:700;color:var(--chalk);}
+  .subtitle{color:var(--chalk-dim);font-size:14px;margin-top:6px;line-height:1.5;}
+  .card{
+    background:linear-gradient(180deg, var(--pitch), var(--pitch-light) 180%);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:20px;
+    margin-top:20px;
+    box-shadow:var(--shadow);
+  }
+  label{display:block;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--chalk-dim);margin-bottom:6px;margin-top:16px;}
+  label:first-child{margin-top:0;}
+  input[type=text], input[type=number], textarea, select{
+    width:100%;
+    background:rgba(0,0,0,0.25);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 12px;
+    color:var(--chalk);
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+  }
+  textarea{min-height:90px;resize:vertical;}
+  input::placeholder, textarea::placeholder{color:rgba(242,240,230,0.35);}
+  .row{display:flex;gap:12px;}
+  .row > *{flex:1;}
+  button{
+    font-family:'Oswald',sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    font-size:14px;
+    font-weight:600;
+    border:none;
+    border-radius:8px;
+    padding:12px 18px;
+    cursor:pointer;
+    transition:transform .08s ease, background .15s ease;
+  }
+  button:active{transform:scale(0.97);}
+  .btn-primary{background:var(--clay);color:#1a0e08;}
+  .btn-primary:hover{background:var(--clay-hover);}
+  .btn-ghost{background:transparent;color:var(--chalk);border:1px solid var(--line);}
+  .btn-ghost:hover{border-color:var(--chalk-dim);}
+  .btn-gold{background:var(--gold);color:#2a1c00;}
+  .btn-alert{background:var(--alert);color:#fff;}
+  .btn-block{width:100%;margin-top:18px;}
+  .hint{font-size:12px;color:var(--chalk-dim);margin-top:6px;}
+  .error{color:var(--alert);font-size:13px;margin-top:10px;font-weight:600;}
+
+  /* Scoreboard */
+  .scoreboard{
+    position:sticky; top:12px; z-index:10;
+    display:flex; align-items:center; justify-content:space-between;
+    background:#0d1a14;
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px 10px;
+    box-shadow:var(--shadow);
+  }
+  .team-box{flex:1;text-align:center;}
+  .team-box.winner .team-label{color:var(--gold);}
+  .team-box.winner .team-score{color:var(--gold); text-shadow:0 0 18px rgba(232,184,75,0.5);}
+  .team-box.winner::after{
+    content:'VENCEU'; display:block; font-family:'Oswald',sans-serif; font-size:10px;
+    letter-spacing:0.12em; color:var(--gold); margin-top:2px;
+  }
+  .team-label{font-family:'Oswald',sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;color:var(--chalk-dim);}
+  .team-score{font-family:'Oswald',sans-serif;font-size:44px;font-weight:700;line-height:1;color:var(--chalk);font-variant-numeric:tabular-nums;}
+  .score-btns{display:flex;gap:6px;justify-content:center;margin-top:6px;}
+  .score-btns button{padding:4px 10px;font-size:14px;}
+  .vs{padding:0 10px;color:var(--gold);font-family:'Oswald',sans-serif;font-size:14px;}
+  .timer-box{
+    text-align:center; flex:1.1;
+    border-left:1px solid var(--line); border-right:1px solid var(--line);
+  }
+  .timer{font-family:'Oswald',sans-serif;font-size:38px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--gold);}
+  .timer.ending{color:var(--alert);}
+  .timer-ctrl{display:flex;gap:6px;justify-content:center;margin-top:6px;}
+  .timer-ctrl button{padding:5px 10px;font-size:12px;}
+
+  /* Súmula / queue */
+  .sumula{
+    position:relative;
+    background:repeating-linear-gradient(180deg, rgba(0,0,0,0.15) 0 1px, transparent 1px 38px), var(--pitch);
+    border:1px dashed rgba(242,240,230,0.3);
+    border-radius:10px;
+    padding:16px 16px 10px;
+  }
+  .slot{
+    display:flex; align-items:center; gap:10px;
+    padding:8px 4px;
+    border-bottom:1px solid var(--line);
+    font-size:14px;
+  }
+  .slot:last-child{border-bottom:none;}
+  .slot-num{
+    font-family:'Oswald',sans-serif; font-size:12px; color:var(--pitch-dark);
+    background:var(--gold); width:22px;height:22px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .slot.next-up .slot-num{background:var(--clay);color:#1a0e08;}
+  .slot-name{flex:1;}
+  .slot-tag{font-size:11px;color:var(--chalk-dim);text-transform:uppercase;letter-spacing:0.06em;}
+  .slot-actions{display:flex;gap:6px;flex-shrink:0;}
+
+  .icon-btn{
+    width:28px;height:28px;border-radius:7px;
+    background:rgba(0,0,0,0.25); color:var(--chalk);
+    font-size:14px; line-height:1;
+    display:flex;align-items:center;justify-content:center;
+    padding:0; border:1px solid var(--line);
+  }
+  .icon-btn:hover{background:rgba(255,255,255,0.1);}
+  .icon-btn.danger{color:#ffb4a3;border-color:rgba(214,73,51,0.4);}
+  .icon-btn.danger:hover{background:rgba(214,73,51,0.18);}
+
+  .players-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
+  .player-list{background:rgba(0,0,0,0.18);border-radius:10px;padding:10px;}
+  .player-list h3{font-size:13px;color:var(--chalk-dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.06em;}
+  .player-row{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:14px;padding:4px 0;}
+  .gk-tag{color:var(--gold);font-size:11px;text-transform:uppercase;margin-left:6px;}
+
+  .rateio{
+    display:flex; justify-content:space-between; align-items:center;
+    background:rgba(0,0,0,0.2); border-radius:10px; padding:12px 14px; margin-top:14px;
+  }
+  .rateio .value{font-family:'Oswald',sans-serif;font-size:22px;color:var(--gold);}
+  .rateio .label{font-size:12px;color:var(--chalk-dim);text-transform:uppercase;letter-spacing:0.06em;}
+
+  /* Modal */
+  .overlay{
+    position:fixed;inset:0;background:rgba(8,14,11,0.82);
+    display:none;align-items:center;justify-content:center;z-index:50;padding:20px;
+  }
+  .overlay.show{display:flex;}
+  .modal{
+    background:var(--pitch); border:1px solid var(--line); border-radius:16px;
+    padding:26px; max-width:420px;width:100%; box-shadow:var(--shadow);
+    text-align:center;
+  }
+  .modal .big-score{font-family:'Oswald',sans-serif;font-size:46px;color:var(--chalk);margin:14px 0;}
+  .modal-btns{display:flex;flex-direction:column;gap:10px;margin-top:16px;}
+  .modal-btns .row{gap:10px;}
+  .summary-winner{font-family:'Oswald',sans-serif; font-size:22px; color:var(--gold); margin:6px 0 2px;}
+  .summary-block{text-align:left; background:rgba(0,0,0,0.2); border-radius:10px; padding:12px 14px; margin-top:14px;}
+  .summary-block .label{font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--chalk-dim);margin-bottom:6px;}
+  .summary-block .names{font-size:14px;line-height:1.6;}
+
+  .confirm-modal{max-width:340px;}
+  .confirm-modal .modal-btns .row > button{flex:1;}
+
+  .hidden{display:none !important;}
+  .footer-note{font-size:11px;color:var(--chalk-dim);text-align:center;margin-top:26px;line-height:1.6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1 class="title">Fut Manager</h1>
+  <p class="subtitle">Sorteio, rateio, fila de espera, placar e cronômetro pra sua pelada não virar bagunça.</p>
+
+  <!-- SETUP SCREEN -->
+  <div class="card" id="setupScreen">
+    <h2 style="font-size:18px;">Lista de Jogadores</h2>
+
+    <label>Jogadores de linha (um nome por linha)</label>
+    <textarea id="inputLinha" placeholder="João
+Pedro
+Lucas
+Rafael
+...">João
+Pedro
+Lucas
+Rafael
+Marcos
+Bruno
+Diego
+Felipe
+Gustavo
+André
+Thiago
+Vitor
+Renato
+Caio
+Otávio</textarea>
+
+    <label>Goleiros (um nome por linha, opcional)</label>
+    <textarea id="inputGoleiros" placeholder="Marcelo
+Fábio" style="min-height:56px;">Marcelo
+Fábio</textarea>
+
+    <div class="row">
+      <div>
+        <label>Jogadores por time</label>
+        <input type="number" id="inputTeamSize" value="5" min="2">
+      </div>
+      <div>
+        <label>Valor da hora (R$)</label>
+        <input type="number" id="inputValorHora" value="120" min="0">
+      </div>
+    </div>
+
+    <label>Regra de fim de partida</label>
+    <select id="inputEndMode" onchange="toggleEndModeFields()">
+      <option value="tempo">Só tempo (joga até acabar o cronômetro)</option>
+      <option value="tempo_gols" selected>Tempo + gols corridos (o que vier primeiro)</option>
+      <option value="gols">Só gols corridos, sem cronômetro (ex: joga até 2)</option>
+    </select>
+
+    <div class="row">
+      <div id="tempoField">
+        <label>Tempo de cada partida (minutos)</label>
+        <input type="number" id="inputTempo" value="10" min="1">
+      </div>
+      <div id="golsField">
+        <label>Gols pra vencer</label>
+        <input type="number" id="inputGolsPraVencer" value="2" min="1">
+      </div>
+    </div>
+
+    <div class="error hidden" id="setupError"></div>
+    <button class="btn-primary btn-block" onclick="sortear()">Sortear times e começar</button>
+    <p class="hint">O goleiro não entra no rateio. Times incompletos ficam de fora do primeiro sorteio e entram como fila individual.</p>
+  </div>
+
+  <!-- MATCH SCREEN -->
+  <div id="matchScreen" class="hidden">
+
+    <div class="scoreboard">
+      <div class="team-box">
+        <div class="team-label" id="labelA">Time A</div>
+        <div class="team-score" id="scoreA">0</div>
+        <div class="score-btns">
+          <button class="btn-ghost" onclick="changeScore('A',-1)">−</button>
+          <button class="btn-ghost" onclick="changeScore('A',1)">+</button>
+        </div>
+      </div>
+      <div class="timer-box" id="timerBox">
+        <div class="timer" id="timerDisplay">10:00</div>
+        <div class="timer-ctrl">
+          <button class="btn-ghost" id="timerStartBtn" onclick="toggleTimer()">Iniciar</button>
+          <button class="btn-ghost" onclick="resetTimer()">Zerar</button>
+        </div>
+      </div>
+      <div class="team-box">
+        <div class="team-label" id="labelB">Time B</div>
+        <div class="team-score" id="scoreB">0</div>
+        <div class="score-btns">
+          <button class="btn-ghost" onclick="changeScore('B',-1)">−</button>
+          <button class="btn-ghost" onclick="changeScore('B',1)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="rateio">
+      <div>
+        <div class="label">Rateio por jogador de linha</div>
+        <div class="value" id="rateioValor">R$ 0,00</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="label">Goleiros</div>
+        <div style="font-size:13px;" id="gkNames">—</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:16px;margin-bottom:10px;">Em campo agora</h2>
+      <div class="players-grid">
+        <div class="player-list">
+          <h3 id="teamATitle">Time A</h3>
+          <div id="teamAList"></div>
+        </div>
+        <div class="player-list">
+          <h3 id="teamBTitle">Time B</h3>
+          <div id="teamBList"></div>
+        </div>
+      </div>
+      <p class="hint">✕ remove quem saiu da pelada (some também do rateio)</p>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:16px;margin-bottom:10px;">Fila de espera</h2>
+      <div class="sumula" id="filaList"></div>
+      <p class="hint" id="filaHint"></p>
+      <p class="hint">⤵ passa a vez (vai pro fim da fila) &nbsp;·&nbsp; ✕ remove quem foi embora</p>
+
+      <div class="row" style="margin-top:14px;align-items:flex-end;">
+        <div>
+          <label>Adicionar jogador</label>
+          <input type="text" id="addPlayerName" placeholder="Nome do jogador" onkeydown="if(event.key==='Enter') addPlayer()">
+        </div>
+        <div style="flex:0 0 110px;">
+          <label>Tipo</label>
+          <select id="addPlayerType">
+            <option value="linha">Linha</option>
+            <option value="goleiro">Goleiro</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-ghost btn-block" onclick="addPlayer()">+ Adicionar à fila</button>
+      <p class="hint">Entra no fim da fila e já conta no rateio na hora.</p>
+    </div>
+
+    <button class="btn-gold btn-block" onclick="openResultModal()">Encerrar partida / Confirmar resultado</button>
+    <button class="btn-ghost btn-block" style="margin-top:10px;" onclick="voltarSetup()">← Refazer sorteio (nova pelada)</button>
+  </div>
+
+  <p class="footer-note">Protótipo de validação de regras — dados não são salvos ao recarregar a página.</p>
+</div>
+
+<!-- RESULT MODAL -->
+<div class="overlay" id="resultOverlay">
+  <div class="modal">
+    <div class="eyebrow">Tempo esgotado</div>
+    <h2>Confirmar resultado</h2>
+    <div class="big-score"><span id="modalScoreA">0</span> &nbsp;x&nbsp; <span id="modalScoreB">0</span></div>
+    <div id="modalStageWinner">
+      <div class="modal-btns">
+        <button class="btn-primary" id="btnWinA" onclick="confirmWinner('A')">Time A venceu</button>
+        <button class="btn-primary" id="btnWinB" onclick="confirmWinner('B')">Time B venceu</button>
+        <button class="btn-ghost" onclick="handleTie()">Empate</button>
+        <button class="btn-ghost" onclick="cancelResultModal()">← Voltar pro jogo</button>
+      </div>
+    </div>
+    <div id="modalStageTieChoice" class="hidden">
+      <p class="hint" style="margin-bottom:10px;">Não há dois times completos aguardando na fila. Como decidir?</p>
+      <div class="modal-btns">
+        <button class="btn-gold" onclick="tieDrawRandom()">Sortear vencedor</button>
+        <button class="btn-ghost" onclick="showManualTieChoice()">Decidimos no par ou ímpar</button>
+        <button class="btn-ghost" onclick="cancelResultModal()">← Voltar pro jogo</button>
+      </div>
+    </div>
+    <div id="modalStageManualTie" class="hidden">
+      <p class="hint" style="margin-bottom:10px;">Quem venceu no par/ímpar?</p>
+      <div class="modal-btns">
+        <button class="btn-primary" onclick="confirmWinner('A')">Time A</button>
+        <button class="btn-primary" onclick="confirmWinner('B')">Time B</button>
+        <button class="btn-ghost" onclick="cancelResultModal()">← Voltar pro jogo</button>
+      </div>
+    </div>
+    <div id="modalStageBothOut" class="hidden">
+      <p class="hint" style="margin-bottom:10px;">Fila tem dois times completos esperando — empate manda os dois times de fora pro fim da fila.</p>
+      <div class="modal-btns">
+        <button class="btn-gold btn-block" onclick="tieBothOut()">Confirmar — os dois saem</button>
+        <button class="btn-ghost" onclick="cancelResultModal()">← Voltar pro jogo</button>
+      </div>
+    </div>
+    <div id="modalStageSummary" class="hidden">
+      <div class="summary-winner" id="summaryWinnerText">🏆 Time A venceu</div>
+      <div class="summary-block">
+        <div class="label">Fica em campo</div>
+        <div class="names" id="summaryStayNames"></div>
+      </div>
+      <div class="summary-block">
+        <div class="label">Próximo desafiante</div>
+        <div class="names" id="summaryChallengerNames"></div>
+      </div>
+      <button class="btn-primary btn-block" onclick="finishRotation()">Continuar pra próxima partida</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL (app-owned, não usa confirm() nativo) -->
+<div class="overlay" id="confirmOverlay">
+  <div class="modal confirm-modal">
+    <div class="eyebrow">Confirmar</div>
+    <p id="confirmMessage" style="margin:10px 0 0;font-size:15px;"></p>
+    <div class="modal-btns">
+      <div class="row">
+        <button class="btn-ghost" onclick="cancelConfirm()">Cancelar</button>
+        <button class="btn-alert" onclick="doConfirm()">Remover</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let state = {
+  teamSize: 5,
+  valorHora: 0,
+  tempoPartida: 600,
+  teamA: [],
+  teamB: [],
+  goalkeeperA: null,
+  goalkeeperB: null,
+  reserveGoalkeepers: [],
+  fila: [],
+  totalLinha: 0,
+  scoreA: 0,
+  scoreB: 0,
+  timerRemaining: 600,
+  timerRunning: false,
+  timerInterval: null,
+  matchEndMode: 'tempo_gols', // 'tempo' | 'tempo_gols' | 'gols'
+  goalsToWin: 2,
+};
+
+function toggleEndModeFields(){
+  const mode = document.getElementById('inputEndMode').value;
+  document.getElementById('tempoField').classList.toggle('hidden', mode === 'gols');
+  document.getElementById('golsField').classList.toggle('hidden', mode === 'tempo');
+}
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function parseLines(text){
+  return text.split('\n').map(s=>s.trim()).filter(Boolean);
+}
+
+function sortear(){
+  const linhaNames = parseLines(document.getElementById('inputLinha').value);
+  const goleiroNames = parseLines(document.getElementById('inputGoleiros').value);
+  const teamSize = parseInt(document.getElementById('inputTeamSize').value) || 5;
+  const valorHora = parseFloat(document.getElementById('inputValorHora').value) || 0;
+  const tempoMin = parseFloat(document.getElementById('inputTempo').value) || 10;
+  const endMode = document.getElementById('inputEndMode').value;
+  const goalsToWin = parseInt(document.getElementById('inputGolsPraVencer').value) || 2;
+
+  const errEl = document.getElementById('setupError');
+  if(linhaNames.length < teamSize*2){
+    errEl.textContent = `Você precisa de pelo menos ${teamSize*2} jogadores de linha pra formar dois times de ${teamSize}.`;
+    errEl.classList.remove('hidden');
+    return;
+  }
+  errEl.classList.add('hidden');
+
+  const shuffled = shuffle(linhaNames);
+  state.teamSize = teamSize;
+  state.valorHora = valorHora;
+  state.tempoPartida = Math.round(tempoMin*60);
+  state.timerRemaining = state.tempoPartida;
+  state.totalLinha = linhaNames.length;
+  state.matchEndMode = endMode;
+  state.goalsToWin = goalsToWin;
+
+  const timerBoxEl = document.getElementById('timerBox');
+  timerBoxEl.classList.toggle('hidden', endMode === 'gols');
+
+  state.teamA = shuffled.slice(0, teamSize);
+  state.teamB = shuffled.slice(teamSize, teamSize*2);
+  state.fila = shuffled.slice(teamSize*2);
+
+  const gks = shuffle(goleiroNames);
+  state.goalkeeperA = gks[0] || null;
+  state.goalkeeperB = gks[1] || null;
+  state.reserveGoalkeepers = gks.slice(2);
+
+  state.scoreA = 0;
+  state.scoreB = 0;
+
+  document.getElementById('setupScreen').classList.add('hidden');
+  document.getElementById('matchScreen').classList.remove('hidden');
+  render();
+}
+
+function voltarSetup(){
+  pauseTimerInternal();
+  document.getElementById('matchScreen').classList.add('hidden');
+  document.getElementById('setupScreen').classList.remove('hidden');
+}
+
+function render(){
+  document.getElementById('scoreA').textContent = state.scoreA;
+  document.getElementById('scoreB').textContent = state.scoreB;
+
+  const rateioValor = state.totalLinha > 0 ? (state.valorHora / state.totalLinha) : 0;
+  document.getElementById('rateioValor').textContent =
+    'R$ ' + rateioValor.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+  let gkNames = [state.goalkeeperA, state.goalkeeperB].filter(Boolean).join(' · ') || '—';
+  if(state.reserveGoalkeepers.length){
+    gkNames += ' (reserva: ' + state.reserveGoalkeepers.join(', ') + ')';
+  }
+  document.getElementById('gkNames').textContent = gkNames;
+
+  document.getElementById('teamAList').innerHTML =
+    state.teamA.map((n,i)=>`<div class="player-row"><span>${n}</span><button class="icon-btn danger" title="Remover (saiu da pelada)" onclick="removeFromTeam('A',${i})">✕</button></div>`).join('') +
+    (state.goalkeeperA ? `<div class="player-row"><span>${state.goalkeeperA} <span class="gk-tag">Goleiro</span></span><button class="icon-btn danger" title="Remover" onclick="removeGoalkeeper('A')">✕</button></div>` : '');
+  document.getElementById('teamBList').innerHTML =
+    state.teamB.map((n,i)=>`<div class="player-row"><span>${n}</span><button class="icon-btn danger" title="Remover (saiu da pelada)" onclick="removeFromTeam('B',${i})">✕</button></div>`).join('') +
+    (state.goalkeeperB ? `<div class="player-row"><span>${state.goalkeeperB} <span class="gk-tag">Goleiro</span></span><button class="icon-btn danger" title="Remover" onclick="removeGoalkeeper('B')">✕</button></div>` : '');
+
+  const filaEl = document.getElementById('filaList');
+  if(state.fila.length === 0){
+    filaEl.innerHTML = `<div class="slot"><div class="slot-name" style="color:var(--chalk-dim);">Fila vazia — todo mundo já está em campo.</div></div>`;
+  } else {
+    filaEl.innerHTML = state.fila.map((name, i)=>{
+      const isNext = i < state.teamSize;
+      return `<div class="slot ${isNext ? 'next-up' : ''}">
+        <div class="slot-num">${i+1}</div>
+        <div class="slot-name">${name}</div>
+        ${isNext ? '<div class="slot-tag">Próximo time</div>' : ''}
+        <div class="slot-actions">
+          <button class="icon-btn" title="Passar a vez (vai pro fim da fila)" onclick="passTurnFila(${i})">⤵</button>
+          <button class="icon-btn danger" title="Remover (saiu da pelada)" onclick="removeFromFila(${i})">✕</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  const filaHint = document.getElementById('filaHint');
+  const faltam = state.teamSize - state.fila.length;
+  filaHint.textContent = faltam > 0
+    ? `Faltam ${faltam} jogador(es) na fila pra fechar o próximo time completo.`
+    : `Fila completa: os ${state.teamSize} primeiros formam o próximo desafiante.`;
+
+  updateTimerDisplay();
+}
+
+/* ---------- CONFIRMAÇÃO PRÓPRIA (não usa confirm() nativo, que é bloqueado em alguns navegadores/pré-visualizações) ---------- */
+let pendingConfirmAction = null;
+
+function showConfirm(message, action){
+  pendingConfirmAction = action;
+  document.getElementById('confirmMessage').textContent = message;
+  document.getElementById('confirmOverlay').classList.add('show');
+}
+
+function cancelConfirm(){
+  pendingConfirmAction = null;
+  document.getElementById('confirmOverlay').classList.remove('show');
+}
+
+function doConfirm(){
+  const action = pendingConfirmAction;
+  cancelConfirm();
+  if(action) action();
+}
+
+/* ---------- EDIÇÃO DE JOGADORES ---------- */
+function removeFromFila(idx){
+  const name = state.fila[idx];
+  showConfirm(`Remover ${name} da pelada de hoje?`, () => {
+    state.fila.splice(idx, 1);
+    state.totalLinha = Math.max(0, state.totalLinha - 1);
+    render();
+  });
+}
+
+function passTurnFila(idx){
+  const [player] = state.fila.splice(idx, 1);
+  state.fila.push(player);
+  render();
+}
+
+function removeFromTeam(team, idx){
+  const list = team === 'A' ? state.teamA : state.teamB;
+  const name = list[idx];
+  showConfirm(`Remover ${name} da pelada de hoje?`, () => {
+    list.splice(idx, 1);
+    state.totalLinha = Math.max(0, state.totalLinha - 1);
+
+    // puxa automaticamente o primeiro da fila pra completar a vaga em campo
+    if(state.fila.length > 0){
+      const nextPlayer = state.fila.shift();
+      list.push(nextPlayer);
+    }
+
+    render();
+  });
+}
+
+function removeGoalkeeper(team){
+  if(team === 'A') state.goalkeeperA = null; else state.goalkeeperB = null;
+  render();
+}
+
+function addPlayer(){
+  const nameInput = document.getElementById('addPlayerName');
+  const name = nameInput.value.trim();
+  if(!name) return;
+  const type = document.getElementById('addPlayerType').value;
+
+  if(type === 'goleiro'){
+    if(!state.goalkeeperA){ state.goalkeeperA = name; }
+    else if(!state.goalkeeperB){ state.goalkeeperB = name; }
+    else { state.reserveGoalkeepers.push(name); }
+  } else {
+    state.fila.push(name);
+    state.totalLinha += 1;
+  }
+
+  nameInput.value = '';
+  render();
+}
+
+function changeScore(team, delta){
+  if(team==='A') state.scoreA = Math.max(0, state.scoreA + delta);
+  else state.scoreB = Math.max(0, state.scoreB + delta);
+  render();
+  checkGoalRule();
+}
+
+function checkGoalRule(){
+  if(state.matchEndMode !== 'gols' && state.matchEndMode !== 'tempo_gols') return;
+  if(state.scoreA >= state.goalsToWin || state.scoreB >= state.goalsToWin){
+    playBeep();
+    openResultModal();
+  }
+}
+
+/* ---------- TIMER ---------- */
+function updateTimerDisplay(){
+  const m = Math.floor(state.timerRemaining/60);
+  const s = state.timerRemaining % 60;
+  const el = document.getElementById('timerDisplay');
+  el.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+  el.classList.toggle('ending', state.timerRemaining <= 10 && state.timerRemaining > 0);
+}
+
+function toggleTimer(){
+  if(state.timerRunning){
+    pauseTimerInternal();
+  } else {
+    state.timerRunning = true;
+    document.getElementById('timerStartBtn').textContent = 'Pausar';
+    state.timerInterval = setInterval(()=>{
+      state.timerRemaining--;
+      updateTimerDisplay();
+      if(state.timerRemaining <= 0){
+        pauseTimerInternal();
+        playBeep();
+        openResultModal();
+      }
+    }, 1000);
+  }
+}
+
+function pauseTimerInternal(){
+  state.timerRunning = false;
+  document.getElementById('timerStartBtn').textContent = 'Iniciar';
+  if(state.timerInterval){ clearInterval(state.timerInterval); state.timerInterval = null; }
+}
+
+function resetTimer(){
+  pauseTimerInternal();
+  state.timerRemaining = state.tempoPartida;
+  updateTimerDisplay();
+}
+
+function playBeep(){
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    let t = ctx.currentTime;
+    for(let i=0;i<3;i++){
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.15, t);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(t);
+      osc.stop(t+0.25);
+      t += 0.35;
+    }
+  }catch(e){ /* audio not available */ }
+}
+
+/* ---------- RESULT / ROTATION LOGIC ---------- */
+function openResultModal(){
+  pauseTimerInternal();
+  document.getElementById('modalScoreA').textContent = state.scoreA;
+  document.getElementById('modalScoreB').textContent = state.scoreB;
+
+  const btnA = document.getElementById('btnWinA');
+  const btnB = document.getElementById('btnWinB');
+  btnA.textContent = 'Time A venceu';
+  btnB.textContent = 'Time B venceu';
+  btnA.classList.remove('btn-gold'); btnB.classList.remove('btn-gold');
+
+  const goalRuleActive = state.matchEndMode === 'gols' || state.matchEndMode === 'tempo_gols';
+  if(goalRuleActive && state.scoreA >= state.goalsToWin && state.scoreA > state.scoreB){
+    btnA.textContent = '🏆 Time A venceu (bateu ' + state.goalsToWin + ')';
+    btnA.classList.add('btn-gold');
+  } else if(goalRuleActive && state.scoreB >= state.goalsToWin && state.scoreB > state.scoreA){
+    btnB.textContent = '🏆 Time B venceu (bateu ' + state.goalsToWin + ')';
+    btnB.classList.add('btn-gold');
+  }
+
+  showModalStage('winner');
+  document.getElementById('resultOverlay').classList.add('show');
+}
+
+function closeModal(){
+  document.getElementById('resultOverlay').classList.remove('show');
+}
+
+function cancelResultModal(){
+  // fecha sem confirmar nada — placar e cronômetro continuam exatamente como estavam
+  closeModal();
+}
+
+function showModalStage(stage){
+  ['winner','tieChoice','manualTie','bothOut','summary'].forEach(s=>{
+    document.getElementById('modalStage' + s.charAt(0).toUpperCase() + s.slice(1)).classList.toggle('hidden', s!==stage);
+  });
+}
+
+function showSummary(winnerLabel, stayingText, challengerText){
+  document.getElementById('summaryWinnerText').textContent = winnerLabel;
+  document.getElementById('summaryStayNames').innerHTML = stayingText || '—';
+  document.getElementById('summaryChallengerNames').innerHTML = challengerText || 'Aguardando mais jogadores na fila...';
+  showModalStage('summary');
+}
+
+function confirmWinner(winner){
+  document.getElementById('labelA').closest('.team-box').classList.toggle('winner', winner === 'A');
+  document.getElementById('labelB').closest('.team-box').classList.toggle('winner', winner === 'B');
+
+  // loser's players go to the end of the fila, preserving their order
+  const loserPlayers = winner === 'A' ? state.teamB : state.teamA;
+  const stayingPlayers = (winner === 'A' ? state.teamA : state.teamB).slice();
+  state.fila = state.fila.concat(loserPlayers);
+
+  // pull the next teamSize players from the front of the fila to challenge
+  const challengers = state.fila.slice(0, state.teamSize);
+  state.fila = state.fila.slice(state.teamSize);
+
+  let challengerNames = challengers;
+  if(winner === 'A'){
+    if(challengers.length === state.teamSize){
+      state.teamB = challengers;
+    } else {
+      state.fila = challengers.concat(state.fila);
+      state.teamB = [];
+      challengerNames = [];
+    }
+  } else {
+    if(challengers.length === state.teamSize){
+      state.teamA = challengers;
+    } else {
+      state.fila = challengers.concat(state.fila);
+      state.teamA = [];
+      challengerNames = [];
+    }
+  }
+
+  const winnerLabel = winner === 'A' ? document.getElementById('labelA').textContent : document.getElementById('labelB').textContent;
+  showSummary(
+    '🏆 ' + winnerLabel + ' venceu!',
+    stayingPlayers.join(', '),
+    challengerNames.length ? challengerNames.join(', ') : ''
+  );
+}
+
+function handleTie(){
+  const twoFullTeamsWaiting = state.fila.length >= state.teamSize*2;
+  if(twoFullTeamsWaiting){
+    showModalStage('bothOut');
+  } else {
+    showModalStage('tieChoice');
+  }
+}
+
+function tieBothOut(){
+  // both current teams go to the end of the queue, in order
+  state.fila = state.fila.concat(state.teamA).concat(state.teamB);
+  const newA = state.fila.slice(0, state.teamSize);
+  const newB = state.fila.slice(state.teamSize, state.teamSize*2);
+  state.fila = state.fila.slice(state.teamSize*2);
+  state.teamA = newA;
+  state.teamB = newB;
+  showSummary('🤝 Empate — os dois times saíram', '', newA.join(', ') + ' &nbsp;×&nbsp; ' + newB.join(', '));
+}
+
+function tieDrawRandom(){
+  const winner = Math.random() < 0.5 ? 'A' : 'B';
+  confirmWinner(winner);
+}
+
+function showManualTieChoice(){
+  showModalStage('manualTie');
+}
+
+function finishRotation(){
+  state.scoreA = 0;
+  state.scoreB = 0;
+  state.timerRemaining = state.tempoPartida;
+  document.getElementById('labelA').closest('.team-box').classList.remove('winner');
+  document.getElementById('labelB').closest('.team-box').classList.remove('winner');
+  closeModal();
+  render();
+}
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {
+      // sem HTTPS/hosting ainda, service worker não registra — app funciona normal mesmo assim
+    });
+  });
+}
+</script>
+</body>
+</html>
