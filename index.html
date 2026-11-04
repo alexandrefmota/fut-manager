@@ -1047,6 +1047,8 @@ function novoSorteio(){
   clearField('inputLinha');
   clearField('inputGoleiros');
   document.getElementById('inputTempo').value = 10;
+  state.colorsSel = [];          // limpa as cores escolhidas (a ordem é marcada de novo a cada sorteio)
+  renderColorPicker();
   saveState();
 }
 
