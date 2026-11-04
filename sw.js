@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fut-manager-v2';
+const CACHE_NAME = 'fut-manager-v25';
 const ASSETS = ['./index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (event) => {

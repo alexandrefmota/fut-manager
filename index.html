@@ -36,7 +36,7 @@
       linear-gradient(180deg, var(--pitch-dark), #0b1712);
     color:var(--chalk);
     min-height:100vh;
-    padding:max(24px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(60px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    padding:max(24px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) calc(96px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
   }
   h1,h2,h3{font-family:'Oswald',sans-serif; margin:0; letter-spacing:0.02em;}
   .wrap{max-width:720px;margin:0 auto;}
@@ -123,7 +123,12 @@
     padding:14px 10px;
     box-shadow:var(--shadow);
   }
+  .scoreboard{flex-wrap:wrap;}
+  .board-actions{flex:0 0 100%;margin-top:12px;padding-top:12px;border-top:1px solid var(--line);}
+  .board-actions button{width:100%;padding:9px 14px;font-size:13px;}
   .team-box{flex:1;text-align:center;}
+  .streak{font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--chalk-dim);min-height:12px;margin-bottom:2px;}
+  .streak.last{color:var(--gold);font-weight:600;}
   .team-box.winner .team-label{color:var(--gold);}
   .team-box.winner .team-score{color:var(--gold); text-shadow:0 0 18px rgba(232,184,75,0.5);}
   .team-box.winner::after{
@@ -143,6 +148,7 @@
   .timer.ending{color:var(--alert);}
   .timer-ctrl{display:flex;gap:6px;justify-content:center;margin-top:6px;}
   .timer-ctrl button{padding:5px 10px;font-size:12px;}
+  .timer-ctrl button:disabled{opacity:.35;cursor:default;}
 
   /* Súmula / queue */
   .sumula{
@@ -160,6 +166,12 @@
     font-size:14px;
   }
   .slot:last-child{border-bottom:none;}
+  .queue-head{
+    display:flex;align-items:center;font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:0.08em;
+    text-transform:uppercase;color:var(--gold);margin-top:14px;padding-bottom:2px;
+  }
+  .queue-head.first{margin-top:0;}
+  .queue-miss{color:var(--chalk-dim);}
   .slot-num{
     font-family:'Oswald',sans-serif; font-size:12px; color:var(--pitch-dark);
     background:var(--gold); width:22px;height:22px;border-radius:50%;
@@ -232,6 +244,118 @@
   .confirm-modal{max-width:340px;}
   .confirm-modal .modal-btns .row > button{flex:1;}
 
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;background:var(--c,transparent);vertical-align:baseline;flex-shrink:0;}
+  .team-label-wrap{position:relative;display:inline-block;}
+  .team-label-wrap select{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;padding:0;border:0;font-size:16px;}
+  .team-label .caret{font-size:9px;margin-left:4px;opacity:.6;}
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip-n{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;margin-right:7px;color:#10201a;font:700 11px/1 'Inter',sans-serif;flex-shrink:0;}
+  .color-legend{margin-top:10px;display:flex;flex-direction:column;gap:6px;}
+  .legend-row{display:flex;align-items:center;font-size:13px;}
+  .legend-role{color:var(--chalk-dim);margin-left:4px;}
+  .update-box{margin-top:16px;border:1px solid var(--gold);border-radius:12px;padding:12px 14px;background:rgba(232,184,75,0.08);}
+  .update-box .update-text{font-size:13px;line-height:1.5;}
+  .update-box .btn-block{margin-top:10px;}
+  .chip{
+    display:inline-flex;align-items:center;gap:0;
+    background:rgba(0,0,0,0.25);color:var(--chalk-dim);border:1px solid var(--line);
+    border-radius:999px;padding:8px 14px;font-size:12px;
+  }
+  .chip.on{color:var(--chalk);border-color:var(--c);background:rgba(255,255,255,0.08);}
+  .chip:not(.on) .dot{opacity:.35;}
+
+  details.draw{padding:0;}
+  details.draw summary{
+    list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;
+    padding:16px 20px;font-family:'Oswald',sans-serif;font-size:16px;letter-spacing:0.02em;
+  }
+  details.draw summary::-webkit-details-marker{display:none;}
+  details.draw summary .chev{transition:transform .15s ease;color:var(--chalk-dim);font-size:12px;}
+  details.draw[open] summary .chev{transform:rotate(180deg);}
+  .draw-body{padding:0 20px 20px;}
+  .draw-group{background:rgba(0,0,0,0.2);border-radius:10px;padding:12px 14px;margin-top:8px;}
+  .draw-group:first-child{margin-top:0;}
+  .draw-title{display:flex;align-items:center;font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:0.04em;text-transform:uppercase;}
+  .draw-badge{margin-left:auto;font-family:'Inter',sans-serif;font-size:11px;color:var(--chalk-dim);text-transform:none;letter-spacing:0;}
+  .draw-names{font-size:14px;line-height:1.6;margin-top:6px;}
+
+  .stat-row{display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px;}
+  .stat-row:last-of-type{border-bottom:none;}
+  .stat-row .k{color:var(--chalk-dim);font-size:12px;text-transform:uppercase;letter-spacing:0.06em;}
+  .stat-big{font-family:'Oswald',sans-serif;font-size:28px;color:var(--gold);}
+  .msg-preview{
+    white-space:pre-wrap;word-break:break-word;background:rgba(0,0,0,0.25);border:1px solid var(--line);
+    border-radius:10px;padding:12px 14px;font-size:14px;line-height:1.55;
+  }
+  .btn-row{display:flex;gap:10px;margin-top:12px;}
+  .btn-row > button{flex:1;}
+
+  .tabbar{
+    position:fixed;left:0;right:0;bottom:0;z-index:20;background:#0d1a14;border-top:1px solid var(--line);
+    padding:6px max(8px,env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));
+  }
+  .tabbar-inner{max-width:720px;margin:0 auto;display:flex;gap:4px;}
+  .tab{
+    flex:1;background:transparent;color:var(--chalk-dim);display:flex;flex-direction:column;align-items:center;gap:3px;
+    padding:8px 4px;font-size:11px;border-radius:10px;
+  }
+  .tab svg{width:22px;height:22px;}
+  .tab.active{color:var(--gold);background:rgba(232,184,75,0.08);}
+  .tab.off{opacity:.4;}
+
+  .toast{
+    position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(10px);
+    background:var(--chalk);color:#10201a;padding:10px 16px;border-radius:999px;font-size:13px;font-weight:600;
+    opacity:0;pointer-events:none;transition:opacity .2s ease, transform .2s ease;z-index:60;white-space:nowrap;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  .btn-primary.locked, .btn-icon-pill.locked{opacity:.45;}
+
+  /* campos numéricos com − e + (também no celular) */
+  .num-wrap{position:relative;}
+  .num-wrap input[type=number]{padding-right:84px;-moz-appearance:textfield;appearance:textfield;}
+  .num-wrap input::-webkit-inner-spin-button,.num-wrap input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+  .stepper{position:absolute;right:6px;top:50%;transform:translateY(-50%);display:flex;gap:6px;}
+  .step-btn{
+    width:32px;height:32px;padding:0;border-radius:8px;background:rgba(16,32,26,0.75);color:var(--chalk);
+    border:1px solid var(--line);font-family:'Inter',sans-serif;font-size:18px;font-weight:500;line-height:1;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .step-btn:hover{border-color:var(--chalk-dim);}
+
+  /* ordem dos times + cor por jogador */
+  .order-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+  .order-row:last-child{border-bottom:none;}
+  .order-role{font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:var(--gold);}
+  .order-role.field{color:var(--chalk);}
+  .order-count{margin-left:auto;font-size:12px;color:var(--chalk-dim);}
+  .order-name{display:inline-flex;align-items:center;font-family:'Oswald',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:0.04em;min-width:110px;}
+  select.color-select{width:auto;min-width:128px;padding:7px 10px;font-size:13px;border-left:4px solid var(--c,var(--line));}
+  .pdot{position:relative;display:inline-flex;align-items:center;padding:4px 6px 4px 0;}
+  .pdot .dot{margin-right:0;}
+  .pdot select{position:absolute;inset:0;width:100%;height:100%;opacity:0;font-size:16px;padding:0;border:0;}
+  .dot.empty{border:1.5px dashed var(--chalk-dim);background:transparent;}
+
+  .info-btn{
+    position:relative;display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;margin-left:6px;
+    border-radius:50%;border:1px solid var(--chalk-dim);color:var(--chalk-dim);
+    font:600 10px/1 'Inter',sans-serif;text-transform:none;letter-spacing:0;cursor:pointer;vertical-align:middle;
+  }
+  .info-btn::after{content:'';position:absolute;inset:-9px;}
+  .info-btn:hover{color:var(--gold);border-color:var(--gold);}
+  .num-wrap select{padding-right:84px;appearance:none;-webkit-appearance:none;}
+  .toast{white-space:normal !important;max-width:90vw;text-align:center;border-radius:14px !important;}
+
+  .slot{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
+  .slot[data-idx]{cursor:grab;}
+  .slot.dnd-origin{opacity:.3;}
+  .slot.drop-before{box-shadow:0 -2px 0 0 var(--gold);}
+  .slot.drop-after{box-shadow:0 2px 0 0 var(--gold);}
+  .dnd-clone{position:fixed;z-index:70;pointer-events:none;background:var(--pitch-light);border:1px solid var(--gold) !important;border-radius:10px;box-shadow:var(--shadow);padding:8px 10px;opacity:.96;}
+  body.dnd-on{-webkit-user-select:none;user-select:none;cursor:grabbing;}
+
   .hidden{display:none !important;}
   .footer-note{font-size:11px;color:var(--chalk-dim);text-align:center;margin-top:26px;line-height:1.6;}
 </style>
@@ -245,20 +369,14 @@
   <!-- SETUP SCREEN -->
   <div class="card" id="setupScreen">
     <div style="display:flex;align-items:center;justify-content:space-between;">
-      <h2 style="font-size:18px;">Lista de Jogadores</h2>
-      <div style="display:flex;gap:8px;">
-        <button id="btnNovoSorteio" class="btn-icon-pill btn-pill-sm hidden" onclick="novoSorteio()" title="Zera listas e tempo de partida">
-          <svg viewBox="0 0 16 16" fill="none"><path d="M13.3 8a5.3 5.3 0 1 1-1.6-3.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M13.3 2.7v3.2h-3.2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Novo Sorteio
-        </button>
-        <button id="btnVoltarPartida" class="btn-icon-pill btn-pill-sm hidden" onclick="voltarPartida()" title="Voltar pra partida em andamento">
-          Voltar
-          <svg viewBox="0 0 16 16" fill="none"><path d="M6.5 3 12 8l-5.5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 8H3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-        </button>
-      </div>
+      <h2 style="font-size:18px;text-transform:uppercase;">Lista e Regras</h2>
+      <button id="btnNovoSorteio" class="btn-icon-pill btn-pill-sm hidden" onclick="novoSorteio()" title="Zera listas e tempo de partida">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M13.3 8a5.3 5.3 0 1 1-1.6-3.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M13.3 2.7v3.2h-3.2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Novo Sorteio
+      </button>
     </div>
 
-    <label>Jogadores de linha (um nome por linha)</label>
+    <label>Jogadores de linha (um nome por linha) <span class="info-btn" role="button" tabindex="0" aria-label="Informações" onclick="info('lista')">i</span></label>
     <div class="field-wrap">
       <textarea id="inputLinha" oninput="autoGrow(this)" placeholder="João
 Pedro
@@ -277,7 +395,7 @@ Fábio"></textarea>
 
     <div class="row">
       <div>
-        <label>Jogadores por time</label>
+        <label>Jogadores por time <span class="info-btn" role="button" tabindex="0" aria-label="Informações" onclick="info('timeSize')">i</span></label>
         <input type="number" id="inputTeamSize" value="5" min="2">
       </div>
       <div>
@@ -286,7 +404,21 @@ Fábio"></textarea>
       </div>
     </div>
 
-    <label>Regra de fim de partida</label>
+    <label>Quantidade de horas <span class="info-btn" role="button" tabindex="0" aria-label="Informações" onclick="info('horas')">i</span></label>
+    <select id="inputHoras" onchange="syncHoras('inputHoras')"></select>
+
+    <label>Identificar times por <span class="info-btn" role="button" tabindex="0" aria-label="Informações" onclick="info('identificar')">i</span></label>
+    <select id="inputTeamMode" onchange="toggleTeamModeFields()">
+      <option value="letras">Letras (Time A, Time B)</option>
+      <option value="cores">Cores de colete</option>
+    </select>
+    <div id="colorField" class="hidden">
+      <label>Cores dos coletes — toque na ordem dos times <span class="info-btn" role="button" tabindex="0" aria-label="Informações" onclick="info('cores')">i</span></label>
+      <div class="chips" id="colorPicker"></div>
+      <div id="colorLegend" class="color-legend"></div>
+    </div>
+
+    <label>Regra de fim de partida <span class="info-btn" role="button" tabindex="0" aria-label="Informações" onclick="info('fim')">i</span></label>
     <select id="inputEndMode" onchange="toggleEndModeFields()">
       <option value="tempo">Só tempo (joga até acabar o cronômetro)</option>
       <option value="tempo_gols" selected>Tempo + gols corridos (o que vier primeiro)</option>
@@ -304,12 +436,31 @@ Fábio"></textarea>
       </div>
     </div>
 
+    <label>Vitórias seguidas pra sair <span class="info-btn" role="button" tabindex="0" aria-label="Informações" onclick="info('streak')">i</span></label>
+    <select id="inputStreakLimit" onchange="toggleStreakFields()">
+      <option value="0">Desligado (quem perde sai)</option>
+      <option value="2">2 vitórias seguidas</option><option value="3" selected>3 vitórias seguidas</option><option value="4">4 vitórias seguidas</option><option value="5">5 vitórias seguidas</option><option value="6">6 vitórias seguidas</option><option value="7">7 vitórias seguidas</option><option value="8">8 vitórias seguidas</option><option value="9">9 vitórias seguidas</option><option value="10">10 vitórias seguidas</option>
+    </select>
+    <div id="desmancharField">
+      <label>Desmanchar o time que sai <span class="info-btn" role="button" tabindex="0" aria-label="Informações" onclick="info('desmanchar')">i</span></label>
+      <select id="inputDesmanchar">
+        <option value="sim">Sim, misturar na fila</option>
+        <option value="nao">Não, sai inteiro pro fim da fila</option>
+      </select>
+    </div>
+
     <div class="error hidden" id="setupError"></div>
-    <button class="btn-primary btn-block btn-with-icon" onclick="sortear()">
+    <div class="update-box hidden" id="updateBox">
+      <div class="update-text" id="updateText"></div>
+      <button class="btn-gold btn-block btn-with-icon" id="btnAtualizar" onclick="atualizar()">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M13.3 8a5.3 5.3 0 1 1-1.6-3.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M13.3 2.7v3.2h-3.2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Atualizar
+      </button>
+    </div>
+    <button class="btn-primary btn-block btn-with-icon" id="btnSortear" onclick="sortear()">
       <svg viewBox="0 0 16 16" fill="none"><path d="M2 3h2.8l7.2 10h2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 13h2.8l1.9-2.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.3 5.6 12 3h2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.5 1.3 14 3l-2.5 1.7M11.5 14.7 14 13l-2.5-1.7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Sortear Times
     </button>
-    <p class="hint">O goleiro não entra no rateio. Times incompletos ficam de fora do primeiro sorteio e entram como fila individual.</p>
   </div>
 
   <!-- MATCH SCREEN -->
@@ -317,7 +468,8 @@ Fábio"></textarea>
 
     <div class="scoreboard">
       <div class="team-box">
-        <div class="team-label" id="labelA">Time A</div>
+        <div class="team-label"><span class="team-label-wrap"><span id="labelA">Time A</span><span class="caret">▾</span><select id="labelSelA" onchange="setLabel('A',this.value)" aria-label="Nome do time A"></select></span></div>
+        <div class="streak" id="streakA"></div>
         <div class="team-score" id="scoreA">0</div>
         <div class="score-btns">
           <button class="btn-ghost" onclick="changeScore('A',-1)">−</button>
@@ -328,32 +480,45 @@ Fábio"></textarea>
         <div class="timer" id="timerDisplay">10:00</div>
         <div class="timer-ctrl">
           <button class="btn-ghost" id="timerStartBtn" onclick="toggleTimer()">Iniciar</button>
-          <button class="btn-ghost" onclick="resetTimer()">Zerar</button>
+          <button class="btn-ghost" id="btnZerar" onclick="zerarPartida()">Zerar</button>
         </div>
       </div>
       <div class="team-box">
-        <div class="team-label" id="labelB">Time B</div>
+        <div class="team-label"><span class="team-label-wrap"><span id="labelB">Time B</span><span class="caret">▾</span><select id="labelSelB" onchange="setLabel('B',this.value)" aria-label="Nome do time B"></select></span></div>
+        <div class="streak" id="streakB"></div>
         <div class="team-score" id="scoreB">0</div>
         <div class="score-btns">
           <button class="btn-ghost" onclick="changeScore('B',-1)">−</button>
           <button class="btn-ghost" onclick="changeScore('B',1)">+</button>
         </div>
       </div>
+      <div class="board-actions">
+        <button class="btn-gold btn-with-icon" onclick="openResultModal()">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M3 14.5V2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M3 2.8c1.3-.9 2.6-.9 4 0s2.7.9 4 0v6.4c-1.3.9-2.6.9-4 0s-2.7-.9-4 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1.6 1.6"/></svg>
+          Encerrar Partida
+        </button>
+      </div>
     </div>
 
+    <div class="card" id="orderCard">
+      <h2 style="font-size:16px;">Ordem dos times <span class="info-btn" role="button" tabindex="0" aria-label="Informações" onclick="info('ordem')">i</span></h2>
+      <div id="orderList"></div>
+    </div>
+
+    <details class="card draw" id="drawCard">
+      <summary>Sorteio dos times <span class="chev">▼</span></summary>
+      <div class="draw-body">
+        <div id="drawList"></div>
+      </div>
+    </details>
+
     <div class="rateio">
-      <div>
-        <div class="label">Rateio por jogador de linha</div>
-        <div class="value" id="rateioValor">R$ 0,00</div>
-      </div>
-      <div style="text-align:right;">
-        <div class="label">Goleiros</div>
-        <div style="font-size:13px;" id="gkNames">—</div>
-      </div>
+      <div class="label">Goleiros</div>
+      <div style="font-size:13px;text-align:right;" id="gkNames">—</div>
     </div>
 
     <div class="card">
-      <h2 style="font-size:16px;">Em campo agora</h2>
+      <h2 style="font-size:16px;">Em campo agora <span class="info-btn" role="button" tabindex="0" aria-label="Informações" onclick="info('campo')">i</span></h2>
       <div class="players-grid">
         <div class="player-list">
           <h3 id="teamATitle">Time A</h3>
@@ -364,18 +529,16 @@ Fábio"></textarea>
           <div id="teamBList"></div>
         </div>
       </div>
-      <p class="hint">✕ remove quem saiu da pelada (some também do rateio)</p>
     </div>
 
     <div class="card">
-      <h2 style="font-size:16px;">Fila de espera</h2>
+      <h2 style="font-size:16px;">Fila de espera <span class="info-btn" role="button" tabindex="0" aria-label="Informações" onclick="info('fila')">i</span></h2>
       <div class="sumula" id="filaList"></div>
       <p class="hint" id="filaHint"></p>
-      <p class="hint">⤵ passa a vez (vai pro fim da fila) &nbsp;·&nbsp; ✕ remove quem foi embora</p>
 
       <div class="row" style="margin-top:16px;align-items:flex-end;">
         <div>
-          <label>Adicionar jogador</label>
+          <label>Adicionar jogador <span class="info-btn" role="button" tabindex="0" aria-label="Informações" onclick="info('adicionar')">i</span></label>
           <input type="text" id="addPlayerName" placeholder="Nome do jogador" onkeydown="if(event.key==='Enter') addPlayer()">
         </div>
         <div style="flex:0 0 110px;">
@@ -387,22 +550,73 @@ Fábio"></textarea>
         </div>
       </div>
       <button class="btn-ghost btn-block" onclick="addPlayer()">+ Adicionar à fila</button>
-      <p class="hint">Entra no fim da fila e já conta no rateio na hora.</p>
     </div>
 
-    <div class="action-row">
-      <button class="btn-icon-pill" onclick="voltarSetup()" title="Início — refazer sorteio (nova pelada)">
-        <svg viewBox="0 0 16 16" fill="none"><path d="M2 7.3 8 2l6 5.3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.3 6.5V13a.8.8 0 0 0 .8.8h2.4v-4h3v4h2.4a.8.8 0 0 0 .8-.8V6.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Início
-      </button>
-      <button class="btn-gold btn-with-icon" onclick="openResultModal()">
-        <svg viewBox="0 0 16 16" fill="none"><path d="M3 14.5V2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M3 2.8c1.3-.9 2.6-.9 4 0s2.7.9 4 0v6.4c-1.3.9-2.6.9-4 0s-2.7-.9-4 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1.6 1.6"/></svg>
-        Encerrar Partida
-      </button>
+  </div>
+
+  <!-- RATEIO SCREEN -->
+  <div id="rateioScreen" class="hidden">
+    <div class="card">
+      <h2 style="font-size:18px;">Rateio <span class="info-btn" role="button" tabindex="0" aria-label="Informações" onclick="info('rateio')">i</span></h2>
+      <div class="stat-row"><span class="k">Valor da hora</span><span id="rtValorHora">R$ 0,00</span></div>
+      <label style="margin-top:12px;">Horas jogadas</label>
+      <select id="rtHoras" onchange="syncHoras('rtHoras')"></select>
+      <div class="stat-row" style="margin-top:8px;"><span class="k">Total a pagar</span><span id="rtTotal">R$ 0,00</span></div>
+      <div class="stat-row"><span class="k">Jogadores de linha</span><span id="rtN">0</span></div>
+      <div class="stat-row"><span class="k">Por pessoa</span><span class="stat-big" id="rtPer">R$ 0,00</span></div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:18px;">Como receber <span class="info-btn" role="button" tabindex="0" aria-label="Informações" onclick="info('receber')">i</span></h2>
+      <label>Forma</label>
+      <select id="pixMode" onchange="updatePixUI()">
+        <option value="chave">Chave Pix</option>
+        <option value="copia">QR Code (Pix Copia e Cola)</option>
+      </select>
+
+      <div id="pixKeyBox">
+        <label>Tipo da chave</label>
+        <select id="pixType" onchange="updatePixUI()">
+          <option value="CPF">CPF</option>
+          <option value="Telefone">Telefone</option>
+          <option value="E-mail">E-mail</option>
+          <option value="Chave aleatória">Chave aleatória</option>
+        </select>
+        <label>Chave</label>
+        <input type="text" id="pixKey" oninput="renderRateio()" autocomplete="off" autocapitalize="off">
+      </div>
+
+      <div id="pixCopiaBox" class="hidden">
+        <label>Código Pix Copia e Cola</label>
+        <textarea id="pixCopia" oninput="renderRateio()" placeholder="Gere o QR Code no app do banco, toque em Copiar código e cole aqui"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:18px;">Mensagem pro WhatsApp <span class="info-btn" role="button" tabindex="0" aria-label="Informações" onclick="info('mensagem')">i</span></h2>
+      <div class="msg-preview" id="msgPreview"></div>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="copyMsg()">Copiar</button>
+        <button class="btn-gold" onclick="openWhats()">Abrir WhatsApp</button>
+      </div>
     </div>
   </div>
 
-  <p class="footer-note">Protótipo de validação de regras — dados não são salvos ao recarregar a página.</p>
+  <nav class="tabbar"><div class="tabbar-inner">
+    <button class="tab active" id="tabSetup" onclick="showTab('setup')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg>
+      Lista e Regras
+    </button>
+    <button class="tab off" id="tabMatch" onclick="showTab('match')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8.2l3.4 2.5-1.3 4h-4.2l-1.3-4z"/><path d="M12 3v5.2M15.4 10.7l5.2-1.6M14.1 14.7l3.2 4.4M9.9 14.7l-3.2 4.4M8.6 10.7 3.4 9.1"/></svg>
+      Jogo
+    </button>
+    <button class="tab" id="tabRateio" onclick="showTab('rateio')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M14.8 9.2c-.5-.9-1.5-1.4-2.8-1.4-1.6 0-2.7.8-2.7 2 0 3 5.6 1.4 5.6 4.1 0 1.2-1.2 2-2.9 2-1.4 0-2.5-.6-3-1.6M12 6.5v1.3M12 16.2v1.3"/></svg>
+      Rateio
+    </button>
+  </div></nav>
+  <div class="toast" id="toast"></div>
 </div>
 
 <!-- RESULT MODAL -->
@@ -416,6 +630,7 @@ Fábio"></textarea>
         <button class="btn-primary" id="btnWinA" onclick="confirmWinner('A')">Time A venceu</button>
         <button class="btn-primary" id="btnWinB" onclick="confirmWinner('B')">Time B venceu</button>
         <button class="btn-ghost" onclick="handleTie()">Empate</button>
+        <button class="btn-ghost" id="btnUndoModal" onclick="undoFromModal()">↩ Desfazer último gol</button>
         <button class="btn-ghost" onclick="cancelResultModal()">← Voltar pro jogo</button>
       </div>
     </div>
@@ -430,8 +645,15 @@ Fábio"></textarea>
     <div id="modalStageManualTie" class="hidden">
       <p class="hint" style="margin-bottom:8px;">Quem venceu no par/ímpar?</p>
       <div class="modal-btns">
-        <button class="btn-primary" onclick="confirmWinner('A')">Time A</button>
-        <button class="btn-primary" onclick="confirmWinner('B')">Time B</button>
+        <button class="btn-primary" id="btnManA" onclick="confirmWinner('A',true)">Time A</button>
+        <button class="btn-primary" id="btnManB" onclick="confirmWinner('B',true)">Time B</button>
+        <button class="btn-ghost" onclick="cancelResultModal()">← Voltar pro jogo</button>
+      </div>
+    </div>
+    <div id="modalStageTieLimit" class="hidden">
+      <p class="hint" id="tieLimitText" style="margin-bottom:8px;line-height:1.5;"></p>
+      <div class="modal-btns">
+        <button class="btn-gold" onclick="confirmTieLimit()">Confirmar</button>
         <button class="btn-ghost" onclick="cancelResultModal()">← Voltar pro jogo</button>
       </div>
     </div>
@@ -445,34 +667,60 @@ Fábio"></textarea>
     <div id="modalStageSummary" class="hidden">
       <div class="summary-winner" id="summaryWinnerText">🏆 Time A venceu</div>
       <div class="summary-block">
-        <div class="label">Fica em campo</div>
+        <div class="label" id="summaryStayLabel">Fica em campo</div>
         <div class="names" id="summaryStayNames"></div>
       </div>
       <div class="summary-block">
-        <div class="label">Próximo desafiante</div>
+        <div class="label" id="summaryChallLabel">Próximo desafiante</div>
         <div class="names" id="summaryChallengerNames"></div>
       </div>
+      <p class="hint" id="summaryNote" style="text-align:left;line-height:1.5;"></p>
       <button class="btn-primary btn-block" onclick="finishRotation()">Continuar pra próxima partida</button>
     </div>
+  </div>
+</div>
+
+<!-- INFO MODAL -->
+<div class="overlay" id="infoOverlay" onclick="if(event.target===this)closeInfo()">
+  <div class="modal confirm-modal">
+    <div class="eyebrow" id="infoTitle"></div>
+    <p id="infoText" style="margin:10px 0 0;font-size:15px;line-height:1.55;text-align:left;white-space:pre-line;"></p>
+    <div class="modal-btns"><button class="btn-ghost" onclick="closeInfo()">Entendi</button></div>
   </div>
 </div>
 
 <!-- CONFIRM MODAL (app-owned, não usa confirm() nativo) -->
 <div class="overlay" id="confirmOverlay">
   <div class="modal confirm-modal">
-    <div class="eyebrow">Confirmar</div>
-    <p id="confirmMessage" style="margin:10px 0 0;font-size:15px;"></p>
-    <div class="modal-btns">
-      <div class="row">
-        <button class="btn-ghost" onclick="cancelConfirm()">Cancelar</button>
-        <button class="btn-alert" onclick="doConfirm()">Remover</button>
-      </div>
-    </div>
+    <div class="eyebrow" id="confirmTitle">Confirmar</div>
+    <p id="confirmMessage" style="margin:10px 0 0;font-size:15px;line-height:1.5;"></p>
+    <div class="modal-btns" id="confirmBtns"></div>
   </div>
 </div>
 
 <script>
+const COLORS = {
+  vermelho:{name:'Vermelho',hex:'#ef5350'},
+  verde:{name:'Verde',hex:'#4ade80'},
+  azul:{name:'Azul',hex:'#4f9bff'},
+  rosa:{name:'Rosa',hex:'#f472b6'},
+  amarelo:{name:'Amarelo',hex:'#f5d90a'}
+};
+const COLOR_ORDER = ['vermelho','verde','rosa','amarelo','azul'];
+let currentTab = 'setup';
+
 let state = {
+  started: false,
+  streak: {A:0, B:0},
+  scoreLog: [],                // histórico de gols (pra desfazer)
+  gameColors: ['vermelho','verde','rosa','amarelo'],   // cores em uso na partida (as que já foram aplicadas)
+  games: {},                   // nome -> partidas jogadas
+  leftPaying: [],              // saíram, mas entram no rateio
+  teamMode: 'letras',          // 'letras' | 'cores'
+  colorsSel: ['vermelho','verde','rosa','amarelo'],
+  tags: {},                    // nome -> cor do colete
+  labelOverride: {A:null, B:null},
+  draw: [],
   teamSize: 5,
   valorHora: 0,
   tempoPartida: 600,
@@ -488,6 +736,7 @@ let state = {
   timerRemaining: 600,
   timerRunning: false,
   timerInterval: null,
+  timerEndAt: null,
   matchEndMode: 'tempo_gols', // 'tempo' | 'tempo_gols' | 'gols'
   goalsToWin: 2,
 };
@@ -507,11 +756,52 @@ function shuffle(arr){
   return a;
 }
 
+function normName(n){ return String(n).trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' '); }
+function allNamesInGame(){
+  return state.teamA.concat(state.teamB, state.fila, state.reserveGoalkeepers, [state.goalkeeperA, state.goalkeeperB].filter(Boolean));
+}
+
 function parseLines(text){
   return text.split('\n').map(s=>s.trim()).filter(Boolean);
 }
 
+function toggleTeamModeFields(){
+  const cores = document.getElementById('inputTeamMode').value === 'cores';
+  document.getElementById('colorField').classList.toggle('hidden', !cores);
+}
+
+function renderColorPicker(){
+  document.getElementById('colorPicker').innerHTML = COLOR_ORDER.map(id => {
+    const idx = state.colorsSel.indexOf(id);
+    const on = idx >= 0;
+    const mark = on ? `<span class="chip-n" style="background:${COLORS[id].hex}">${idx+1}</span>` : `<i class="dot"></i>`;
+    return `<button type="button" class="chip ${on?'on':''}" style="--c:${COLORS[id].hex}" onclick="toggleColor('${id}')">${mark}${COLORS[id].name}</button>`;
+  }).join('');
+  const roles = i => i < 2 ? 'começa em campo' : ordemJogar(i-2);
+  document.getElementById('colorLegend').innerHTML = state.colorsSel.length
+    ? state.colorsSel.map((id,i) => `<div class="legend-row"><span class="chip-n" style="background:${COLORS[id].hex}">${i+1}</span>${COLORS[id].name} <span class="legend-role">· ${roles(i)}</span></div>`).join('')
+    : '<div class="legend-row legend-role">Toque nas cores, na ordem dos times.</div>';
+}
+
+function toggleColor(id){
+  const i = state.colorsSel.indexOf(id);
+  if(i >= 0) state.colorsSel.splice(i,1); else state.colorsSel.push(id);
+  renderColorPicker();
+  checkPending();
+  saveState();
+}
+
 function sortear(){
+  if(state.timerRunning){ askPause('Sortear Times'); return; }
+  if(state.started){
+    showConfirm('Já existe uma partida em andamento. Sortear de novo zera times, fila e placar. Continuar?', doSortear, 'Sortear');
+  } else {
+    doSortear();
+  }
+}
+
+function doSortear(){
+  if(state.timerRunning){ askPause('Sortear Times'); return; }
   const linhaNames = parseLines(document.getElementById('inputLinha').value);
   const goleiroNames = parseLines(document.getElementById('inputGoleiros').value);
   const teamSize = parseInt(document.getElementById('inputTeamSize').value) || 5;
@@ -519,16 +809,32 @@ function sortear(){
   const tempoMin = parseFloat(document.getElementById('inputTempo').value) || 10;
   const endMode = document.getElementById('inputEndMode').value;
   const goalsToWin = parseInt(document.getElementById('inputGolsPraVencer').value) || 2;
+  const mode = document.getElementById('inputTeamMode').value;
 
   const errEl = document.getElementById('setupError');
+  const seen = new Set(), dups = new Set();
+  linhaNames.concat(goleiroNames).forEach(n => { const k = normName(n); if(seen.has(k)) dups.add(n); seen.add(k); });
+  if(dups.size){
+    errEl.textContent = `Nome repetido: ${[...dups].join(', ')}. Cada nome só pode aparecer uma vez (ex.: Pedro S. e Pedro M.).`;
+    errEl.classList.remove('hidden');
+    return;
+  }
   if(linhaNames.length < teamSize*2){
     errEl.textContent = `Você precisa de pelo menos ${teamSize*2} jogadores de linha pra formar dois times de ${teamSize}.`;
     errEl.classList.remove('hidden');
     return;
   }
+  if(mode === 'cores' && state.colorsSel.length < 2){
+    errEl.textContent = 'Escolha pelo menos 2 cores de colete.';
+    errEl.classList.remove('hidden');
+    return;
+  }
   errEl.classList.add('hidden');
 
+  pauseTimerInternal();
   const shuffled = shuffle(linhaNames);
+  state.started = true;
+  state.teamMode = mode;
   state.teamSize = teamSize;
   state.valorHora = valorHora;
   state.tempoPartida = Math.round(tempoMin*60);
@@ -536,50 +842,533 @@ function sortear(){
   state.totalLinha = linhaNames.length;
   state.matchEndMode = endMode;
   state.goalsToWin = goalsToWin;
+  state.labelOverride = {A:null, B:null};
+  state.tags = {};
+  state.draw = [];
+  state.games = {};
+  state.streak = {A:0, B:0};
+  state.leftPaying = [];
+  state.gameColors = state.colorsSel.slice();
 
-  const timerBoxEl = document.getElementById('timerBox');
-  timerBoxEl.classList.toggle('hidden', endMode === 'gols');
+  applyTimerVisibility();
 
   state.teamA = shuffled.slice(0, teamSize);
   state.teamB = shuffled.slice(teamSize, teamSize*2);
   state.fila = shuffled.slice(teamSize*2);
+
+  // grupos sorteados, na ordem em que entram
+  const groups = [state.teamA, state.teamB];
+  for(let i=0;i<state.fila.length;i+=teamSize) groups.push(state.fila.slice(i,i+teamSize));
+  if(mode === 'cores'){
+    groups.forEach((g,i)=>{ const c = state.gameColors[i]; if(c) g.forEach(n => { state.tags[n] = c; }); });
+  }
+  buildDraw();
 
   const gks = shuffle(goleiroNames);
   state.goalkeeperA = gks[0] || null;
   state.goalkeeperB = gks[1] || null;
   state.reserveGoalkeepers = gks.slice(2);
 
-  state.scoreA = 0;
+  state.scoreA = 0; state.scoreLog = [];
   state.scoreB = 0;
 
-  document.getElementById('setupScreen').classList.add('hidden');
-  document.getElementById('matchScreen').classList.remove('hidden');
   render();
+  showTab('match');
+  const dc = document.getElementById('drawCard'); if(dc) dc.open = true;
 }
 
-function voltarSetup(){
-  pauseTimerInternal();
-  document.getElementById('matchScreen').classList.add('hidden');
-  document.getElementById('setupScreen').classList.remove('hidden');
-  // mantém listas e configurações preenchidas — só o "Novo Sorteio" zera
-  document.getElementById('btnNovoSorteio').classList.remove('hidden');
-  // partida continua em andamento no estado — dá pra voltar pra ela
-  document.getElementById('btnVoltarPartida').classList.remove('hidden');
+function buildDraw(){
+  const size = state.teamSize;
+  const groups = [state.teamA, state.teamB];
+  for(let i=0;i<state.fila.length;i+=size) groups.push(state.fila.slice(i,i+size));
+  state.draw = [];
+  if(state.teamMode === 'cores'){
+    groups.forEach((g,i)=>{
+      const c = majorityColor(g);
+      state.draw.push({
+        title: c ? 'Time ' + COLORS[c].name : 'Grupo ' + (i+1),
+        color: c, players: g.slice(),
+        badge: (i<2 ? 'Em campo' : ordemJogar(i-2)) + (g.length<size ? ' · incompleto' : '')
+      });
+    });
+  } else {
+    state.draw.push({title:'Time A', color:null, players:state.teamA.slice(), badge:'Em campo'});
+    state.draw.push({title:'Time B', color:null, players:state.teamB.slice(), badge:'Em campo'});
+    if(state.fila.length) state.draw.push({title:'Fila de espera', color:null, players:state.fila.slice(), badge:''});
+  }
 }
 
-function voltarPartida(){
-  document.getElementById('setupScreen').classList.add('hidden');
-  document.getElementById('matchScreen').classList.remove('hidden');
+/* ---------- ATUALIZAR (aplica mudanças de regras numa partida já sorteada) ---------- */
+function formRules(){
+  return {
+    teamSize: parseInt(document.getElementById('inputTeamSize').value) || 5,
+    teamMode: document.getElementById('inputTeamMode').value,
+    colors: state.colorsSel.join(','),
+    endMode: document.getElementById('inputEndMode').value,
+    tempo: Math.round((parseFloat(document.getElementById('inputTempo').value) || 10) * 60),
+    gols: parseInt(document.getElementById('inputGolsPraVencer').value) || 2
+  };
+}
+
+function pendingChanges(){
+  if(!state.started) return [];
+  const f = formRules(), out = [];
+  if(f.teamSize !== state.teamSize) out.push('jogadores por time');
+  if(f.teamMode !== state.teamMode) out.push('identificação dos times');
+  else if(f.teamMode === 'cores' && f.colors !== state.gameColors.join(',')) out.push('cores dos coletes');
+  if(f.endMode !== state.matchEndMode) out.push('regra de fim de partida');
+  if(f.endMode !== 'gols' && f.tempo !== state.tempoPartida) out.push('tempo da partida');
+  if(f.endMode !== 'tempo' && f.gols !== state.goalsToWin) out.push('gols pra vencer');
+  return out;
+}
+
+function checkPending(){
+  const box = document.getElementById('updateBox');
+  if(!box) return;
+  const ch = pendingChanges();
+  box.classList.toggle('hidden', ch.length === 0);
+  if(ch.length){
+    document.getElementById('updateText').textContent = 'Você mudou: ' + ch.join(', ') + '. Toque em Atualizar pra valer na partida, sem sortear de novo.';
+  }
+  document.getElementById('btnAtualizar').classList.toggle('locked', !!state.timerRunning);
+}
+
+function atualizar(){
+  if(state.timerRunning){ askPause('Atualizar'); return; }
+  const f = formRules();
+  const errEl = document.getElementById('setupError');
+  const total = state.teamA.length + state.teamB.length + state.fila.length;
+  if(total < f.teamSize*2){
+    errEl.textContent = `Com ${total} jogadores de linha não dá pra formar dois times de ${f.teamSize}.`;
+    errEl.classList.remove('hidden');
+    return;
+  }
+  if(f.teamMode === 'cores' && state.colorsSel.length < 2){
+    errEl.textContent = 'Escolha pelo menos 2 cores de colete.';
+    errEl.classList.remove('hidden');
+    return;
+  }
+  errEl.classList.add('hidden');
+  const emAndamento = state.scoreA + state.scoreB > 0 || state.timerRemaining < state.tempoPartida;
+  if(f.teamSize !== state.teamSize && emAndamento){
+    showChoice(`Existe uma partida em andamento (placar ${state.scoreA} x ${state.scoreB}). Mudar o tamanho do time refaz os grupos e zera placar e cronômetro. Continuar?`, [
+      {label:'Atualizar e zerar a partida', cls:'btn-primary', action:doAtualizar},
+      {label:'Cancelar', cls:'btn-ghost'}
+    ], 'Partida em andamento');
+  } else {
+    doAtualizar();
+  }
+}
+
+function doAtualizar(){
+  const f = formRules();
+  const oldSize = state.teamSize;
+  const oldColors = state.gameColors.slice();
+  // cor de cada grupo antes da mudança, por posição: [A, B, 1º da fila, 2º da fila...]
+  const prev = [];
+  if(state.teamMode === 'cores'){
+    ['A','B'].forEach(side => { const k = teamLabel(side).key; prev.push(COLORS[k] ? k : null); });
+    for(let i=0;i<state.fila.length;i+=oldSize) prev.push(majorityColor(state.fila.slice(i,i+oldSize)));
+  }
+
+  // regra de fim e tempo
+  const oldTempo = state.tempoPartida;
+  state.matchEndMode = f.endMode;
+  state.goalsToWin = f.gols;
+  state.tempoPartida = f.tempo;
+  if(state.timerRemaining === oldTempo || state.timerRemaining > f.tempo) state.timerRemaining = f.tempo;
+  applyTimerVisibility();
+
+  // tamanho do time: refaz os cortes mantendo a ordem de todo mundo
+  if(f.teamSize !== oldSize){
+    const all = state.teamA.concat(state.teamB, state.fila);
+    state.teamSize = f.teamSize;
+    state.teamA = all.slice(0, f.teamSize);
+    state.teamB = all.slice(f.teamSize, f.teamSize*2);
+    state.fila = all.slice(f.teamSize*2);
+    state.scoreA = 0; state.scoreLog = []; state.scoreB = 0;
+    state.streak = {A:0, B:0};
+    state.timerRemaining = state.tempoPartida;
+    pauseTimerInternal();
+    document.getElementById('labelA').closest('.team-box').classList.remove('winner');
+    document.getElementById('labelB').closest('.team-box').classList.remove('winner');
+  }
+
+  // cores
+  state.labelOverride = {A:null, B:null};
+  state.teamMode = f.teamMode;
+  state.gameColors = state.colorsSel.slice();
+  state.tags = {};
+  if(state.teamMode === 'cores'){
+    const groups = [state.teamA, state.teamB];
+    for(let i=0;i<state.fila.length;i+=state.teamSize) groups.push(state.fila.slice(i,i+state.teamSize));
+    const used = new Set(), assigned = groups.map(() => null);
+    // se a ORDEM das cores que você tocou mudou, vale a sua ordem: 1ª e 2ª em campo, 3ª próxima, 4ª segunda...
+    const novas = state.gameColors;
+    const comuns = novas.filter(c => oldColors.includes(c)).join(',');
+    const comunsAntes = oldColors.filter(c => novas.includes(c)).join(',');
+    const reordenou = comuns !== comunsAntes;
+    if(reordenou){
+      groups.forEach((g,i) => { if(novas[i]) assigned[i] = novas[i]; });
+    } else {
+      // só entrou ou saiu cor: mantém o colete de quem já tem e preenche os que ficaram sem
+      groups.forEach((g,i) => { const c = prev[i]; if(c && novas.includes(c) && !used.has(c)){ assigned[i] = c; used.add(c); } });
+      groups.forEach((g,i) => {
+        if(!assigned[i]){
+          const c = novas.find(x => !used.has(x));
+          if(c){ assigned[i] = c; used.add(c); }
+        }
+      });
+    }
+    groups.forEach((g,i) => { if(assigned[i]) g.forEach(n => { state.tags[n] = assigned[i]; }); });
+  }
+  buildDraw();
   render();
+  toast('Partida atualizada');
+}
+
+function showTab(name){
+  if(name === 'match' && !state.started){ toast('Faça o sorteio primeiro'); return; }
+  currentTab = name;
+  document.getElementById('setupScreen').classList.toggle('hidden', name !== 'setup');
+  document.getElementById('matchScreen').classList.toggle('hidden', name !== 'match');
+  document.getElementById('rateioScreen').classList.toggle('hidden', name !== 'rateio');
+  document.getElementById('tabSetup').classList.toggle('active', name === 'setup');
+  document.getElementById('tabMatch').classList.toggle('active', name === 'match');
+  document.getElementById('tabRateio').classList.toggle('active', name === 'rateio');
+  if(name === 'rateio') renderRateio();
+  if(name === 'match') render();
+  window.scrollTo(0,0);
+  saveState();
 }
 
 function novoSorteio(){
+  if(state.timerRunning){ askPause('Novo Sorteio'); return; }
   clearField('inputLinha');
   clearField('inputGoleiros');
   document.getElementById('inputTempo').value = 10;
-  document.getElementById('btnNovoSorteio').classList.add('hidden');
-  // esvaziou as listas pra um novo sorteio — a partida antiga não existe mais pra voltar
-  document.getElementById('btnVoltarPartida').classList.add('hidden');
+  saveState();
+}
+
+/* ---------- NOMES / CORES DOS TIMES ---------- */
+const ORDINAIS = ['Próximo','Segundo','Terceiro','Quarto','Quinto','Sexto','Sétimo','Oitavo','Nono','Décimo'];
+function ordemJogar(i){ return (ORDINAIS[i] || (i+1) + 'º') + ' a jogar'; }
+
+// A cor do colete acompanha o GRUPO da fila: cada bloco de N jogadores usa a cor de quem está na frente dele.
+function recolorQueue(){
+  if(state.teamMode !== 'cores') return [];
+  const size = state.teamSize, changed = [];
+  for(let i=0; i<state.fila.length; i+=size){
+    const chunk = state.fila.slice(i, i+size);
+    const c = state.tags[chunk[0]] || majorityColor(chunk);
+    if(!c) continue;
+    chunk.forEach(n => {
+      if(state.tags[n] !== c){ changed.push({name:n, to:c}); state.tags[n] = c; }
+    });
+  }
+  dedupeColors();
+  return changed;
+}
+
+// nunca dois times completos com o mesmo colete: quem aparece depois (campo > fila, na ordem) troca pra uma cor livre
+function dedupeColors(){
+  if(state.teamMode !== 'cores') return;
+  const N = state.teamSize, groups = [];
+  [state.teamA, state.teamB].forEach(t => { if(t.length === N) groups.push(t); });
+  for(let i=0; i<state.fila.length; i+=N){ const g = state.fila.slice(i, i+N); if(g.length === N) groups.push(g); }
+  const cols = groups.map(g => majorityColor(g));
+  const seen = new Set();
+  groups.forEach((g, i) => {
+    let c = cols[i];
+    if(c && seen.has(c)){
+      const later = new Set(cols.slice(i+1).filter(Boolean));
+      const free = state.gameColors.find(x => !seen.has(x) && !later.has(x));
+      if(free){ g.forEach(n => { state.tags[n] = free; }); c = free; }
+    }
+    if(c) seen.add(c);
+  });
+}
+
+// cor de cada bloco da fila, por posição (antes de mexer na ordem)
+function queueColors(){
+  if(state.teamMode !== 'cores') return [];
+  const out = [];
+  for(let i=0; i<state.fila.length; i+=state.teamSize){
+    const chunk = state.fila.slice(i, i+state.teamSize);
+    out.push(majorityColor(chunk) || state.tags[chunk[0]] || null);
+  }
+  return out;
+}
+
+// depois de mexer na ordem: cada bloco mantém a sua cor, quem muda de bloco troca de colete
+function applyQueueColors(colors){
+  if(state.teamMode !== 'cores') return [];
+  const changed = [];
+  for(let i=0; i<state.fila.length; i+=state.teamSize){
+    const c = colors[i/state.teamSize];
+    if(!c) continue;
+    state.fila.slice(i, i+state.teamSize).forEach(n => {
+      if(state.tags[n] !== c){ changed.push({name:n, to:c}); state.tags[n] = c; }
+    });
+  }
+  return changed;
+}
+
+function changedText(changed){
+  const parts = changed.slice(0,3).map(c => `${c.name} → ${COLORS[c.to].name}`);
+  if(changed.length > 3) parts.push('+' + (changed.length-3));
+  return parts.join(', ');
+}
+
+function colorsInUse(){
+  const used = new Set();
+  ['A','B'].forEach(side => { const k = teamLabel(side).key; if(COLORS[k]) used.add(k); });
+  for(let i=0; i<state.fila.length; i+=state.teamSize){
+    const c = majorityColor(state.fila.slice(i, i+state.teamSize));
+    if(c) used.add(c);
+  }
+  return used;
+}
+
+function nextFreeColor(){
+  const used = colorsInUse();
+  return state.gameColors.find(c => !used.has(c)) || null;
+}
+
+function countGames(){
+  state.teamA.concat(state.teamB).forEach(n => { state.games[n] = (state.games[n]||0) + 1; });
+}
+
+function leaveFlow(name, apply){
+  const g = state.games[name] || 0;
+  if(g > 0){
+    showChoice(`${name} jogou ${g} partida${g>1?'s':''}. Ele entra no rateio?`, [
+      {label:'Entra no rateio', cls:'btn-primary', action:()=>apply(true)},
+      {label:'Não entra', cls:'btn-alert', action:()=>apply(false)},
+      {label:'Cancelar', cls:'btn-ghost'}
+    ], 'Saiu da pelada');
+  } else {
+    showConfirm(`Remover ${name} da pelada de hoje?`, ()=>apply(false));
+  }
+}
+
+function majorityColor(players){
+  const counts = {};
+  players.forEach(n => { const c = state.tags[n]; if(c) counts[c] = (counts[c]||0)+1; });
+  let best = null, bc = 0;
+  for(const c in counts){ if(counts[c] > bc){ best = c; bc = counts[c]; } }
+  return (best && bc*2 > players.length) ? best : null;
+}
+
+// time que entra sem colete próprio herda o colete de quem saiu; quem saiu volta pra fila sem colete
+function inheritColor(newTeam, oldColor, oldPlayers){
+  if(state.teamMode !== 'cores' || !oldColor || newTeam.length === 0) return false;
+  if(majorityColor(newTeam)) return false;
+  newTeam.forEach(n => { state.tags[n] = oldColor; });
+  oldPlayers.forEach(n => { if(newTeam.indexOf(n) < 0) delete state.tags[n]; });
+  return true;
+}
+
+// dois times em campo nunca ficam com o mesmo colete: o time que entra pega a cor livre
+function fixFieldClash(fieldTeam, newTeam, freeColor, swapNames){
+  if(state.teamMode !== 'cores' || !freeColor || newTeam.length === 0) return;
+  const cs = majorityColor(fieldTeam), cc = majorityColor(newTeam);
+  if(!cs || cc !== cs || freeColor === cs) return;
+  newTeam.forEach(n => { state.tags[n] = freeColor; });
+  swapNames.forEach(n => { if(newTeam.indexOf(n) < 0) state.tags[n] = cc; });
+}
+
+function teamLabel(side){
+  let key = state.labelOverride[side];
+  if(!key){
+    key = side;
+    const players = side === 'A' ? state.teamA : state.teamB;
+    if(state.teamMode === 'cores' && players.length){
+      const counts = {};
+      players.forEach(n => { const c = state.tags[n]; if(c) counts[c] = (counts[c]||0)+1; });
+      let best = null, bc = 0;
+      for(const c in counts){ if(counts[c] > bc){ best = c; bc = counts[c]; } }
+      if(best && bc*2 > players.length) key = best;
+    }
+  }
+  if(COLORS[key]) return {key, text:'Time ' + COLORS[key].name, color:COLORS[key].hex};
+  return {key, text:'Time ' + key, color:null};
+}
+
+function setLabel(side, key){
+  if(COLORS[key] && state.teamMode === 'cores'){
+    const players = side === 'A' ? state.teamA : state.teamB;
+    players.forEach(n => { state.tags[n] = key; });
+    state.labelOverride[side] = null;
+  } else {
+    state.labelOverride[side] = key;
+  }
+  render();
+}
+
+function dotHtml(color){ return color ? `<i class="dot" style="--c:${color}"></i>` : ''; }
+function escAttr(t){ return String(t).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function colorOptions(sel){
+  return `<option value="">Sem cor</option>` + COLOR_ORDER.map(id => `<option value="${id}" ${id===sel?'selected':''}>${COLORS[id].name}</option>`).join('');
+}
+function nameHtml(n){
+  if(state.teamMode !== 'cores') return n;
+  const c = state.tags[n];
+  const hex = c && COLORS[c] ? COLORS[c].hex : null;
+  return `<span class="pdot" title="Trocar a cor do colete"><i class="dot ${hex?'':'empty'}" style="--c:${hex||'transparent'}"></i><select data-n="${escAttr(n)}" onchange="setPlayerColor(this.dataset.n,this.value)">${colorOptions(c)}</select></span>${n}`;
+}
+
+function setPlayerColor(name, color){
+  if(color) state.tags[name] = color; else delete state.tags[name];
+  render();
+}
+
+function setGroupColor(kind, idx, color){
+  let players;
+  if(kind === 'A'){ players = state.teamA; state.labelOverride.A = null; }
+  else if(kind === 'B'){ players = state.teamB; state.labelOverride.B = null; }
+  else players = state.fila.slice(idx*state.teamSize, idx*state.teamSize + state.teamSize);
+  players.forEach(n => { if(color) state.tags[n] = color; else delete state.tags[n]; });
+  render();
+}
+
+function renderOrder(){
+  const cores = state.teamMode === 'cores';
+  const rows = [];
+  const mk = (kind, idx, role, field, players, colorKey, titleText) => {
+    const hex = colorKey && COLORS[colorKey] ? COLORS[colorKey].hex : '';
+    const left = cores
+      ? `<select class="color-select" style="--c:${hex||'var(--line)'}" onchange="setGroupColor('${kind}',${idx},this.value)">${colorOptions(colorKey)}</select>`
+      : `<span class="order-name">${titleText}</span>`;
+    const falta = players.length < state.teamSize ? ` · faltam ${state.teamSize - players.length}` : '';
+    rows.push(`<div class="order-row">${left}<span class="order-role ${field?'field':''}">${role}</span><span class="order-count">${players.length} jogador${players.length===1?'':'es'}${falta}</span></div>`);
+  };
+  ['A','B'].forEach(side => {
+    const players = side === 'A' ? state.teamA : state.teamB;
+    const L = teamLabel(side);
+    mk(side, 0, 'Em campo', true, players, COLORS[L.key] ? L.key : '', L.text);
+  });
+  for(let g=0; g*state.teamSize < state.fila.length; g++){
+    const chunk = state.fila.slice(g*state.teamSize, g*state.teamSize + state.teamSize);
+    mk('q', g, ordemJogar(g), false, chunk, majorityColor(chunk) || '', 'Fila');
+  }
+  document.getElementById('orderList').innerHTML = rows.join('');
+
+}
+
+/* ---------- RATEIO / PIX / WHATSAPP ---------- */
+function brl(n){
+  return 'R$ ' + n.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function fmtHoras(h){ return Math.floor(h) + ':' + (h % 1 ? '30' : '00'); }
+
+function fillHoras(){
+  let opts = '';
+  for(let h=0.5; h<=8; h+=0.5) opts += `<option value="${h}">${fmtHoras(h)}</option>`;
+  ['inputHoras','rtHoras'].forEach(id => {
+    const el = document.getElementById(id);
+    el.innerHTML = opts;
+    el.value = '1';
+  });
+}
+
+function syncHoras(fromId){
+  const v = document.getElementById(fromId).value;
+  document.getElementById('inputHoras').value = v;
+  document.getElementById('rtHoras').value = v;
+  renderRateio();
+  saveState();
+}
+
+function linhaRoster(){
+  const names = state.started ? state.teamA.concat(state.teamB, state.fila, state.leftPaying) : parseLines(document.getElementById('inputLinha').value);
+  return names.slice().sort((a,b)=>a.localeCompare(b,'pt-BR'));
+}
+
+function rateioData(){
+  const valorHora = parseFloat(document.getElementById('inputValorHora').value) || 0;
+  const horas = parseFloat(document.getElementById('inputHoras').value) || 1;
+  const total = valorHora * horas;
+  const n = state.started ? state.totalLinha : parseLines(document.getElementById('inputLinha').value).length;
+  const per = n > 0 ? Math.ceil(total / n * 100 - 1e-9) / 100 : 0;
+  return {valorHora, horas, total, n, per};
+}
+
+function pixValue(){
+  const mode = document.getElementById('pixMode').value;
+  return (mode === 'copia' ? document.getElementById('pixCopia').value : document.getElementById('pixKey').value).trim();
+}
+
+function updatePixUI(){
+  const mode = document.getElementById('pixMode').value;
+  document.getElementById('pixKeyBox').classList.toggle('hidden', mode !== 'chave');
+  document.getElementById('pixCopiaBox').classList.toggle('hidden', mode !== 'copia');
+  const type = document.getElementById('pixType').value;
+  const input = document.getElementById('pixKey');
+  const cfg = {
+    'CPF': ['000.000.000-00','numeric'],
+    'Telefone': ['+55 11 91234-5678','tel'],
+    'E-mail': ['nome@email.com','email'],
+    'Chave aleatória': ['xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx','text']
+  }[type];
+  input.placeholder = cfg[0];
+  input.inputMode = cfg[1];
+  renderRateio();
+}
+
+function buildMsg(){
+  const r = rateioData();
+  const d = new Date().toLocaleDateString('pt-BR', {weekday:'long', day:'2-digit', month:'2-digit'});
+  let txt = `⚽ *Pelada de hoje* (${d})\n⏱️ Tempo: ${fmtHoras(r.horas)} h · Total: ${brl(r.total)}\n💰 Valor por pessoa: *${brl(r.per)}*`;
+  const v = pixValue();
+  if(v){
+    if(document.getElementById('pixMode').value === 'copia'){
+      txt += `\n\n*Pix Copia e Cola:*\n${v}`;
+    } else {
+      txt += `\n\n*Pix (${document.getElementById('pixType').value}):*\n${v}`;
+    }
+  }
+  const nomes = linhaRoster();
+  if(nomes.length){
+    txt += `\n\n*Quem já pagou?* (troque ⬜ por ✅)\n` + nomes.map(n => '⬜ ' + n).join('\n');
+  }
+  return txt;
+}
+
+function renderRateio(){
+  const r = rateioData();
+  document.getElementById('rtValorHora').textContent = brl(r.valorHora);
+  document.getElementById('rtHoras').value = document.getElementById('inputHoras').value;
+  document.getElementById('rtTotal').textContent = brl(r.total);
+  document.getElementById('rtN').textContent = r.n;
+  document.getElementById('rtPer').textContent = brl(r.per);
+  document.getElementById('msgPreview').textContent = buildMsg();
+}
+
+function copyMsg(){ copyText(buildMsg(), 'Mensagem copiada'); }
+function openWhats(){ window.open('https://wa.me/?text=' + encodeURIComponent(buildMsg()), '_blank'); }
+
+async function copyText(text, msg){
+  try{
+    await navigator.clipboard.writeText(text);
+  }catch(e){
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); }catch(_){}
+    ta.remove();
+  }
+  toast(msg || 'Copiado');
+}
+
+let toastTimer = null;
+function toast(msg, ms){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove('show'), ms || 1800);
 }
 
 function clearField(id){
@@ -598,9 +1387,40 @@ function render(){
   document.getElementById('scoreA').textContent = state.scoreA;
   document.getElementById('scoreB').textContent = state.scoreB;
 
-  const rateioValor = state.totalLinha > 0 ? (state.valorHora / state.totalLinha) : 0;
-  document.getElementById('rateioValor').textContent =
-    'R$ ' + rateioValor.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const lim = streakLimit();
+  ['A','B'].forEach(side => {
+    const el = document.getElementById('streak' + side);
+    if(!lim || !state.started){ el.textContent = ''; el.classList.remove('last'); }
+    else {
+      const v = state.streak[side];
+      el.classList.toggle('last', v >= lim - 1);
+      el.textContent = v >= lim - 1 ? `Última partida · ${v}/${lim}` : `Vitórias ${v}/${lim}`;
+    }
+  });
+  ['A','B'].forEach(side => {
+    const L = teamLabel(side);
+    document.getElementById('label'+side).innerHTML = dotHtml(L.color) + L.text;
+    document.getElementById('team'+side+'Title').innerHTML = dotHtml(L.color) + L.text;
+    const sel = document.getElementById('labelSel'+side);
+    sel.innerHTML = `<option value="A">Time A</option><option value="B">Time B</option>` +
+      COLOR_ORDER.map(id => `<option value="${id}">${COLORS[id].name}</option>`).join('');
+    sel.value = L.key;
+  });
+
+  document.getElementById('drawList').innerHTML = state.draw.map(g => `
+    <div class="draw-group">
+      <div class="draw-title">${dotHtml(g.color ? COLORS[g.color].hex : null)}${g.title}<span class="draw-badge">${g.badge||''}</span></div>
+      <div class="draw-names">${g.players.join(', ')}</div>
+    </div>`).join('') +
+    ([state.goalkeeperA, state.goalkeeperB].some(Boolean)
+      ? `<div class="draw-group"><div class="draw-title">Goleiros</div><div class="draw-names">${[state.goalkeeperA, state.goalkeeperB].filter(Boolean).join(', ')}</div></div>` : '');
+
+  renderOrder();
+  checkPending();
+  updateSortearLock();
+  document.getElementById('tabMatch').classList.toggle('off', !state.started);
+  document.getElementById('btnNovoSorteio').classList.toggle('hidden', !state.started);
+  if(currentTab === 'rateio') renderRateio();
 
   let gkNames = [state.goalkeeperA, state.goalkeeperB].filter(Boolean).join(' · ') || '—';
   if(state.reserveGoalkeepers.length){
@@ -609,87 +1429,150 @@ function render(){
   document.getElementById('gkNames').textContent = gkNames;
 
   document.getElementById('teamAList').innerHTML =
-    state.teamA.map((n,i)=>`<div class="player-row"><span>${n}</span><button class="icon-btn danger" title="Remover (saiu da pelada)" onclick="removeFromTeam('A',${i})">✕</button></div>`).join('') +
+    state.teamA.map((n,i)=>`<div class="player-row"><span>${nameHtml(n)}</span><button class="icon-btn danger" title="Remover (saiu da pelada)" onclick="removeFromTeam('A',${i})">✕</button></div>`).join('') +
     (state.goalkeeperA ? `<div class="player-row"><span>${state.goalkeeperA} <span class="gk-tag">Goleiro</span></span><button class="icon-btn danger" title="Remover" onclick="removeGoalkeeper('A')">✕</button></div>` : '');
   document.getElementById('teamBList').innerHTML =
-    state.teamB.map((n,i)=>`<div class="player-row"><span>${n}</span><button class="icon-btn danger" title="Remover (saiu da pelada)" onclick="removeFromTeam('B',${i})">✕</button></div>`).join('') +
+    state.teamB.map((n,i)=>`<div class="player-row"><span>${nameHtml(n)}</span><button class="icon-btn danger" title="Remover (saiu da pelada)" onclick="removeFromTeam('B',${i})">✕</button></div>`).join('') +
     (state.goalkeeperB ? `<div class="player-row"><span>${state.goalkeeperB} <span class="gk-tag">Goleiro</span></span><button class="icon-btn danger" title="Remover" onclick="removeGoalkeeper('B')">✕</button></div>` : '');
 
   const filaEl = document.getElementById('filaList');
   if(state.fila.length === 0){
     filaEl.innerHTML = `<div class="slot"><div class="slot-name" style="color:var(--chalk-dim);">Fila vazia — todo mundo já está em campo.</div></div>`;
   } else {
-    filaEl.innerHTML = state.fila.map((name, i)=>{
-      const isNext = i < state.teamSize;
-      return `<div class="slot ${isNext ? 'next-up' : ''}">
+    const size = state.teamSize;
+    let html = '';
+    state.fila.forEach((name, i)=>{
+      const g = Math.floor(i/size);
+      if(i % size === 0){
+        const chunk = state.fila.slice(g*size, g*size + size);
+        const mc = state.teamMode === 'cores' ? majorityColor(chunk) : null;
+        let cname = mc ? ' · ' + dotHtml(COLORS[mc].hex) + 'Time ' + COLORS[mc].name : '';
+        if(!mc && state.teamMode === 'cores' && chunk.length === size){
+          const fc = ['A','B'].map(sd => teamLabel(sd).key).filter(k => COLORS[k]);
+          cname = g === 0 && fc.length === 2
+            ? ' · veste o colete de quem perder: ' + dotHtml(COLORS[fc[0]].hex) + 'ou ' + dotHtml(COLORS[fc[1]].hex)
+            : ' · colete a definir';
+        }
+        const falta = chunk.length < size ? ` · faltam ${size - chunk.length}` : '';
+        html += `<div class="queue-head ${g===0?'first':''}"><span>${ordemJogar(g)}${cname}</span><span class="queue-miss">${falta}</span></div>`;
+      }
+      const isLast = i === state.fila.length - 1;
+      html += `<div class="slot ${g===0 ? 'next-up' : ''}" data-idx="${i}">
         <div class="slot-num">${i+1}</div>
-        <div class="slot-name">${name}</div>
-        ${isNext ? '<div class="slot-tag">Próximo time</div>' : ''}
+        <div class="slot-name">${nameHtml(name)}</div>
         <div class="slot-actions">
-          <button class="icon-btn" title="Passar a vez (vai pro fim da fila)" onclick="passTurnFila(${i})">⤵</button>
+          ${isLast ? '' : `<button class="icon-btn" title="Passar a vez (vai pro fim da fila)" onclick="passTurnFila(${i})">⤵</button>`}
           <button class="icon-btn danger" title="Remover (saiu da pelada)" onclick="removeFromFila(${i})">✕</button>
         </div>
       </div>`;
-    }).join('');
+    });
+    filaEl.innerHTML = html;
   }
   const filaHint = document.getElementById('filaHint');
-  const faltam = state.teamSize - state.fila.length;
-  filaHint.textContent = faltam > 0
-    ? `Faltam ${faltam} jogador(es) na fila pra fechar o próximo time completo.`
-    : `Fila completa: os ${state.teamSize} primeiros formam o próximo desafiante.`;
+  const size = state.teamSize, nq = state.fila.length;
+  let ft = '';
+  if(nq === 0){
+    ft = '';
+  } else if(nq % size !== 0){
+    ft = `Faltam ${size - (nq % size)} jogador(es) pra fechar o ${ordemJogar(Math.floor(nq/size)).toLowerCase()}.`;
+  } else {
+    ft = `Fila completa: os ${size} primeiros formam o próximo a jogar.`;
+  }
+  if(state.teamMode === 'cores'){
+    const teams = (state.teamA.length ? 1 : 0) + (state.teamB.length ? 1 : 0) + Math.ceil(nq/size);
+    ft += (ft ? ' ' : '') + `Times: ${teams} de ${state.gameColors.length}` + (teams > state.gameColors.length ? ' — tem grupo sem colete: quem entra veste o colete de quem sair.' : '.');
+  }
+  filaHint.textContent = ft;
 
   updateTimerDisplay();
 }
 
 /* ---------- CONFIRMAÇÃO PRÓPRIA (não usa confirm() nativo, que é bloqueado em alguns navegadores/pré-visualizações) ---------- */
-let pendingConfirmAction = null;
-
-function showConfirm(message, action){
-  pendingConfirmAction = action;
+function showChoice(message, choices, title){
+  document.getElementById('confirmTitle').textContent = title || 'Confirmar';
   document.getElementById('confirmMessage').textContent = message;
+  const box = document.getElementById('confirmBtns');
+  box.innerHTML = '';
+  choices.forEach(c => {
+    const b = document.createElement('button');
+    b.className = c.cls || 'btn-ghost';
+    b.textContent = c.label;
+    b.onclick = () => { cancelConfirm(); if(c.action) c.action(); };
+    box.appendChild(b);
+  });
   document.getElementById('confirmOverlay').classList.add('show');
 }
 
+function showConfirm(message, action, okLabel){
+  showChoice(message, [
+    {label: okLabel || 'Remover', cls:'btn-alert', action},
+    {label:'Cancelar', cls:'btn-ghost'}
+  ]);
+}
+
 function cancelConfirm(){
-  pendingConfirmAction = null;
   document.getElementById('confirmOverlay').classList.remove('show');
 }
 
-function doConfirm(){
-  const action = pendingConfirmAction;
-  cancelConfirm();
-  if(action) action();
+// cronômetro rodando = partida em andamento: pede pra pausar antes de mexer nos times
+function askPause(acao){
+  showChoice(`Existe uma partida em andamento: o cronômetro está rodando. Pause o cronômetro e toque de novo em ${acao}.`, [
+    {label:'Pausar cronômetro', cls:'btn-primary', action:()=>{ pauseTimerInternal(); saveState(); toast('Cronômetro pausado'); }},
+    {label:'Cancelar', cls:'btn-ghost'}
+  ], 'Partida em andamento');
 }
 
 /* ---------- EDIÇÃO DE JOGADORES ---------- */
 function removeFromFila(idx){
   const name = state.fila[idx];
-  showConfirm(`Remover ${name} da pelada de hoje?`, () => {
+  leaveFlow(name, (paying) => {
     state.fila.splice(idx, 1);
-    state.totalLinha = Math.max(0, state.totalLinha - 1);
+    if(paying) state.leftPaying.push(name); else state.totalLinha = Math.max(0, state.totalLinha - 1);
+    recolorQueue();
     render();
   });
 }
 
 function passTurnFila(idx){
+  const before = queueColors();
   const [player] = state.fila.splice(idx, 1);
   state.fila.push(player);
+  const changed = applyQueueColors(before);
   render();
+  if(changed.length){
+    toast(`${player} passou a vez. Trocam de colete: ${changedText(changed)}`, 4500);
+  } else {
+    toast(`${player} passou a vez`);
+  }
+}
+
+function moveInQueue(from, to){
+  const before = queueColors();
+  const [player] = state.fila.splice(from, 1);
+  state.fila.splice(to, 0, player);
+  const changed = applyQueueColors(before);
+  render();
+  const base = `${player} foi pro ${to+1}º lugar da fila`;
+  toast(changed.length ? `${base}. Trocam de colete: ${changedText(changed)}` : base, changed.length ? 4500 : 2200);
 }
 
 function removeFromTeam(team, idx){
   const list = team === 'A' ? state.teamA : state.teamB;
   const name = list[idx];
-  showConfirm(`Remover ${name} da pelada de hoje?`, () => {
+  leaveFlow(name, (paying) => {
+    const tl = teamLabel(team);
+    const teamColor = (state.teamMode === 'cores' && COLORS[tl.key]) ? tl.key : null;
     list.splice(idx, 1);
-    state.totalLinha = Math.max(0, state.totalLinha - 1);
+    if(paying) state.leftPaying.push(name); else state.totalLinha = Math.max(0, state.totalLinha - 1);
 
-    // puxa automaticamente o primeiro da fila pra completar a vaga em campo
+    // puxa automaticamente o primeiro da fila pra completar a vaga em campo (e ele veste o colete do time)
     if(state.fila.length > 0){
       const nextPlayer = state.fila.shift();
+      if(teamColor) state.tags[nextPlayer] = teamColor;
       list.push(nextPlayer);
     }
 
+    recolorQueue();
     render();
   });
 }
@@ -705,13 +1588,43 @@ function addPlayer(){
   if(!name) return;
   const type = document.getElementById('addPlayerType').value;
 
+  const key = normName(name);
+  const backIdx = state.leftPaying.findIndex(n => normName(n) === key);
+  if(allNamesInGame().some(n => normName(n) === key)){
+    toast('Já existe alguém com esse nome. Use um nome diferente (ex.: Pedro S.).', 3500);
+    return;
+  }
+  const returning = type !== 'goleiro' && backIdx >= 0;
+  if(returning) state.leftPaying.splice(backIdx, 1);
+
   if(type === 'goleiro'){
     if(!state.goalkeeperA){ state.goalkeeperA = name; }
     else if(!state.goalkeeperB){ state.goalkeeperB = name; }
     else { state.reserveGoalkeepers.push(name); }
   } else {
-    state.fila.push(name);
-    state.totalLinha += 1;
+    const size = state.teamSize;
+    const cores = state.teamMode === 'cores';
+    // time em campo faltando gente e fila vazia: o jogador completa o time
+    const falta = state.fila.length === 0 ? [['A', state.teamA], ['B', state.teamB]].find(x => x[1].length < size) : null;
+    if(falta){
+      const tl = teamLabel(falta[0]);
+      if(cores && COLORS[tl.key]) state.tags[name] = tl.key;
+      falta[1].push(name);
+    } else {
+      if(cores){
+        // entra no grupo incompleto do fim da fila; se não houver, abre um grupo com a próxima cor livre
+        let color = null;
+        if(state.fila.length % size !== 0){
+          const last = state.fila.slice(Math.floor(state.fila.length/size)*size);
+          color = majorityColor(last) || state.tags[last[last.length-1]] || null;
+        } else {
+          color = nextFreeColor();
+        }
+        if(color) state.tags[name] = color;
+      }
+      state.fila.push(name);
+    }
+    if(!returning) state.totalLinha += 1;
   }
 
   nameInput.value = '';
@@ -719,10 +1632,21 @@ function addPlayer(){
 }
 
 function changeScore(team, delta){
-  if(team==='A') state.scoreA = Math.max(0, state.scoreA + delta);
-  else state.scoreB = Math.max(0, state.scoreB + delta);
+  const before = team === 'A' ? state.scoreA : state.scoreB;
+  const after = Math.max(0, before + delta);
+  if(team==='A') state.scoreA = after; else state.scoreB = after;
+  if(after !== before){ state.scoreLog.push({team, delta: after - before}); if(state.scoreLog.length > 50) state.scoreLog.shift(); }
   render();
   checkGoalRule();
+}
+
+function undoScore(){
+  const last = state.scoreLog.pop();
+  if(!last) return;
+  if(last.team === 'A') state.scoreA = Math.max(0, state.scoreA - last.delta);
+  else state.scoreB = Math.max(0, state.scoreB - last.delta);
+  render();
+  toast('↩ Desfeito: ' + (last.delta > 0 ? 'gol' : 'gol removido') + ' do ' + teamLabel(last.team).text);
 }
 
 function checkGoalRule(){
@@ -746,31 +1670,143 @@ function toggleTimer(){
   if(state.timerRunning){
     pauseTimerInternal();
   } else {
-    state.timerRunning = true;
-    document.getElementById('timerStartBtn').textContent = 'Pausar';
-    state.timerInterval = setInterval(()=>{
-      state.timerRemaining--;
-      updateTimerDisplay();
-      if(state.timerRemaining <= 0){
-        pauseTimerInternal();
-        playBeep();
-        openResultModal();
-      }
-    }, 1000);
+    if(state.timerRemaining <= 0) return;
+    startTimerInternal();
+  }
+  saveState();
+}
+
+// O cronômetro usa a hora "de fim" (timestamp) em vez de ir subtraindo 1 por segundo.
+// Assim ele continua correto mesmo com a tela bloqueada, em segundo plano ou com o app fechado e reaberto.
+function updateSortearLock(){
+  const b = document.getElementById('btnSortear');
+  if(b) b.classList.toggle('locked', !!state.timerRunning);
+  const a = document.getElementById('btnAtualizar');
+  if(a) a.classList.toggle('locked', !!state.timerRunning);
+}
+
+function startTimerInternal(){
+  state.timerRunning = true;
+  updateSortearLock();
+  state.timerEndAt = Date.now() + state.timerRemaining*1000;
+  document.getElementById('timerStartBtn').textContent = 'Pausar';
+  if(state.timerInterval) clearInterval(state.timerInterval);
+  state.timerInterval = setInterval(syncTimer, 250);
+  requestWakeLock();
+}
+
+function syncTimer(){
+  if(!state.timerRunning || !state.timerEndAt) return;
+  const rem = Math.max(0, Math.ceil((state.timerEndAt - Date.now())/1000));
+  if(rem !== state.timerRemaining){
+    state.timerRemaining = rem;
+    updateTimerDisplay();
+    saveState();
+  }
+  if(rem <= 0){
+    pauseTimerInternal();
+    playBeep();
+    openResultModal();
   }
 }
 
 function pauseTimerInternal(){
+  if(state.timerRunning && state.timerEndAt){
+    state.timerRemaining = Math.max(0, Math.ceil((state.timerEndAt - Date.now())/1000));
+  }
   state.timerRunning = false;
+  state.timerEndAt = null;
+  updateSortearLock();
   document.getElementById('timerStartBtn').textContent = 'Iniciar';
   if(state.timerInterval){ clearInterval(state.timerInterval); state.timerInterval = null; }
+  updateTimerDisplay();
+  releaseWakeLock();
 }
 
-function resetTimer(){
-  pauseTimerInternal();
-  state.timerRemaining = state.tempoPartida;
-  updateTimerDisplay();
+function applyTimerVisibility(){
+  const semRelogio = state.matchEndMode === 'gols';
+  document.getElementById('timerDisplay').classList.toggle('hidden', semRelogio);
+  document.getElementById('timerStartBtn').classList.toggle('hidden', semRelogio);
+  document.getElementById('btnZerar').textContent = semRelogio ? 'Zerar placar' : 'Zerar';
 }
+
+// Zerar: placar volta pra 0 x 0 e o cronômetro volta pro tempo cheio (parado, pronto pra iniciar)
+function zerarPartida(){
+  const algo = state.scoreA + state.scoreB > 0 || state.timerRunning || state.timerRemaining < state.tempoPartida;
+  const fazer = () => {
+    pauseTimerInternal();
+    state.scoreA = 0; state.scoreLog = [];
+    state.scoreB = 0;
+    state.timerRemaining = state.tempoPartida;
+    document.getElementById('labelA').closest('.team-box').classList.remove('winner');
+    document.getElementById('labelB').closest('.team-box').classList.remove('winner');
+    render();
+    toast(state.matchEndMode === 'gols' ? 'Placar zerado' : 'Placar zerado e cronômetro reiniciado');
+  };
+  if(algo) showConfirm(state.matchEndMode === 'gols' ? 'Zerar o placar?' : 'Zerar o placar e reiniciar o cronômetro?', fazer, 'Zerar');
+  else fazer();
+}
+
+/* ---------- TELA ACESA (enquanto o cronômetro roda) ---------- */
+let wakeLock = null;
+async function requestWakeLock(){
+  try{
+    if('wakeLock' in navigator && !wakeLock){
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', ()=>{ wakeLock = null; });
+    }
+  }catch(e){ wakeLock = null; }
+}
+function releaseWakeLock(){
+  try{ if(wakeLock){ wakeLock.release(); wakeLock = null; } }catch(e){}
+}
+
+/* ---------- SALVAR / RESTAURAR (sobrevive a fechar o app) ---------- */
+const STORAGE_KEY = 'futManagerV1';
+const FORM_IDS = ['inputStreakLimit','inputDesmanchar','inputHoras','inputLinha','inputGoleiros','inputTeamSize','inputValorHora','inputTeamMode','inputEndMode','inputTempo','inputGolsPraVencer','pixMode','pixType','pixKey','pixCopia'];
+
+function saveState(){
+  try{
+    const { timerInterval, ...plain } = state;
+    const form = {};
+    FORM_IDS.forEach(id => { form[id] = document.getElementById(id).value; });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ state: plain, form, tab: currentTab, savedAt: Date.now() }));
+  }catch(e){ /* sem armazenamento disponível */ }
+}
+
+function restoreState(){
+  let data = null;
+  try{ data = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); }catch(e){}
+  if(!data || !data.state) return {tab:'setup', wasRunning:false};
+
+  FORM_IDS.forEach(id => {
+    if(data.form && data.form[id] !== undefined) document.getElementById(id).value = data.form[id];
+  });
+  Object.assign(state, data.state, { timerInterval: null });
+  state.colorsSel = (state.colorsSel||[]).filter(c=>COLORS[c]);
+  if(!Array.isArray(state.scoreLog)) state.scoreLog = [];
+  if(!state.streak) state.streak = {A:0, B:0};
+  if(!data.state.gameColors) state.gameColors = state.colorsSel.slice();
+  if(data.state.started === undefined) state.started = (state.teamA.length > 0);
+  const wasRunning = state.timerRunning;
+  state.timerRunning = false;
+
+  let tab = data.tab || (data.screen === 'match' ? 'match' : 'setup');
+  if(tab === 'match' && !state.started) tab = 'setup';
+  return {tab, wasRunning};
+}
+
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState === 'visible'){
+    syncTimer();
+    if(state.timerRunning) requestWakeLock();
+  } else {
+    saveState();
+  }
+});
+window.addEventListener('pagehide', saveState);
+document.addEventListener('input', () => { checkPending(); saveState(); });
+document.addEventListener('change', () => { checkPending(); saveState(); });
 
 function playBeep(){
   try{
@@ -793,24 +1829,29 @@ function playBeep(){
 /* ---------- RESULT / ROTATION LOGIC ---------- */
 function openResultModal(){
   pauseTimerInternal();
+  if(currentTab !== 'match') showTab('match');
   document.getElementById('modalScoreA').textContent = state.scoreA;
   document.getElementById('modalScoreB').textContent = state.scoreB;
 
   const btnA = document.getElementById('btnWinA');
   const btnB = document.getElementById('btnWinB');
-  btnA.textContent = 'Time A venceu';
-  btnB.textContent = 'Time B venceu';
+  const LA = teamLabel('A').text, LB = teamLabel('B').text;
+  btnA.textContent = LA + ' venceu';
+  btnB.textContent = LB + ' venceu';
+  document.getElementById('btnManA').textContent = LA;
+  document.getElementById('btnManB').textContent = LB;
   btnA.classList.remove('btn-gold'); btnB.classList.remove('btn-gold');
 
   const goalRuleActive = state.matchEndMode === 'gols' || state.matchEndMode === 'tempo_gols';
   if(goalRuleActive && state.scoreA >= state.goalsToWin && state.scoreA > state.scoreB){
-    btnA.textContent = '🏆 Time A venceu (bateu ' + state.goalsToWin + ')';
+    btnA.textContent = '🏆 ' + LA + ' venceu';
     btnA.classList.add('btn-gold');
   } else if(goalRuleActive && state.scoreB >= state.goalsToWin && state.scoreB > state.scoreA){
-    btnB.textContent = '🏆 Time B venceu (bateu ' + state.goalsToWin + ')';
+    btnB.textContent = '🏆 ' + LB + ' venceu';
     btnB.classList.add('btn-gold');
   }
 
+  document.getElementById('btnUndoModal').classList.toggle('hidden', !state.scoreLog.length);
   showModalStage('winner');
   document.getElementById('resultOverlay').classList.add('show');
 }
@@ -819,74 +1860,144 @@ function closeModal(){
   document.getElementById('resultOverlay').classList.remove('show');
 }
 
+function undoFromModal(){
+  closeModal();
+  undoScore();
+}
+
 function cancelResultModal(){
   // fecha sem confirmar nada — placar e cronômetro continuam exatamente como estavam
   closeModal();
 }
 
 function showModalStage(stage){
-  ['winner','tieChoice','manualTie','bothOut','summary'].forEach(s=>{
+  ['winner','tieChoice','manualTie','tieLimit','bothOut','summary'].forEach(s=>{
     document.getElementById('modalStage' + s.charAt(0).toUpperCase() + s.slice(1)).classList.toggle('hidden', s!==stage);
   });
 }
 
-function showSummary(winnerLabel, stayingText, challengerText){
+function colorTag(side){
+  if(state.teamMode !== 'cores') return '';
+  const L = teamLabel(side);
+  return L.color ? ' · ' + dotHtml(L.color) + L.text : '';
+}
+
+function showSummary(winnerLabel, stayingText, challengerText, stayTag, challTag){
+  document.getElementById('summaryNote').textContent = '';
   document.getElementById('summaryWinnerText').textContent = winnerLabel;
+  document.getElementById('summaryStayLabel').innerHTML = 'Fica em campo' + (stayTag || '');
+  document.getElementById('summaryChallLabel').innerHTML = 'Próximo desafiante' + (challTag || '');
   document.getElementById('summaryStayNames').innerHTML = stayingText || '—';
   document.getElementById('summaryChallengerNames').innerHTML = challengerText || 'Aguardando mais jogadores na fila...';
   showModalStage('summary');
 }
 
-function confirmWinner(winner){
+/* ---------- RODÍZIO / VITÓRIAS SEGUIDAS ---------- */
+function streakLimit(){ const v = parseInt(document.getElementById('inputStreakLimit').value) || 0; return v >= 2 ? v : 0; }
+function breakTeamOn(){ return document.getElementById('inputDesmanchar').value === 'sim'; }
+function otherSide(side){ return side === 'A' ? 'B' : 'A'; }
+function teamArr(side){ return side === 'A' ? state.teamA : state.teamB; }
+function toggleStreakFields(){
+  document.getElementById('desmancharField').classList.toggle('hidden', streakLimit() === 0);
+}
+
+// time de "leavingSide" sai pro fim da fila; os próximos da fila entram no lugar dele
+function rotate(stayingSide, leavingSide, dismantle){
+  const N = state.teamSize;
+  const leaving = teamArr(leavingSide).slice();
+  const leavingColor = majorityColor(leaving);
+  let mixed = false, toQueue = leaving;
+  // desmanchar só quando existe grupo incompleto na fila pra completar; senão o time sai inteiro
+  if(dismantle && state.fila.length % N !== 0){ toQueue = shuffle(leaving); mixed = true; }
+  state.fila = state.fila.concat(toQueue);
+  const challengers = state.fila.slice(0, N);
+  state.fila = state.fila.slice(N);
+  let challengerNames = challengers;
+  if(challengers.length === N){
+    if(leavingSide === 'A') state.teamA = challengers; else state.teamB = challengers;
+  } else {
+    state.fila = challengers.concat(state.fila);
+    if(leavingSide === 'A') state.teamA = []; else state.teamB = [];
+    challengerNames = [];
+  }
+  if(challengerNames.length && !inheritColor(challengerNames, leavingColor, leaving))
+    fixFieldClash(teamArr(stayingSide), challengerNames, leavingColor, leaving);
+  state.labelOverride[leavingSide] = null;   // quem entra assume o colete/nome automático
+  state.streak[leavingSide] = 0;
+  recolorQueue();
+  return {challengerNames, mixed, wholeBecauseClosed: dismantle && !mixed};
+}
+
+function confirmWinner(winner, byTie){
+  countGames();
+  const L = streakLimit();
+  const loserSide = otherSide(winner);
+  const winnerText = teamLabel(winner).text;
   document.getElementById('labelA').closest('.team-box').classList.toggle('winner', winner === 'A');
   document.getElementById('labelB').closest('.team-box').classList.toggle('winner', winner === 'B');
 
-  // loser's players go to the end of the fila, preserving their order
-  const loserPlayers = winner === 'A' ? state.teamB : state.teamA;
-  const stayingPlayers = (winner === 'A' ? state.teamA : state.teamB).slice();
-  state.fila = state.fila.concat(loserPlayers);
-
-  // pull the next teamSize players from the front of the fila to challenge
-  const challengers = state.fila.slice(0, state.teamSize);
-  state.fila = state.fila.slice(state.teamSize);
-
-  let challengerNames = challengers;
-  if(winner === 'A'){
-    if(challengers.length === state.teamSize){
-      state.teamB = challengers;
-    } else {
-      state.fila = challengers.concat(state.fila);
-      state.teamB = [];
-      challengerNames = [];
-    }
-  } else {
-    if(challengers.length === state.teamSize){
-      state.teamA = challengers;
-    } else {
-      state.fila = challengers.concat(state.fila);
-      state.teamA = [];
-      challengerNames = [];
+  let staying = winner, leaving = loserSide, dismantle = false;
+  let head = '🏆 ' + winnerText + ' venceu!';
+  let note = '';
+  if(!byTie){
+    state.streak[winner] += 1;   // desempate (sorteio/par ou ímpar) não soma vitória
+    if(L && state.streak[winner] >= L){
+      if(state.fila.length > 0){
+        staying = loserSide; leaving = winner; dismantle = breakTeamOn();
+        state.streak[loserSide] = 0;   // quem fica em campo recomeça do zero
+        head = `🏆 ${winnerText} venceu a ${L}ª seguida e sai!`;
+      } else {
+        note = `Ninguém esperando na fila, então a regra de ${L} vitórias seguidas não foi aplicada.`;
+      }
     }
   }
-
-  const winnerLabel = winner === 'A' ? document.getElementById('labelA').textContent : document.getElementById('labelB').textContent;
-  showSummary(
-    '🏆 ' + winnerLabel + ' venceu!',
-    stayingPlayers.join(', '),
-    challengerNames.length ? challengerNames.join(', ') : ''
-  );
+  const stayingPlayers = teamArr(staying).slice();
+  const r = rotate(staying, leaving, dismantle);
+  if(leaving === winner){
+    note = r.mixed ? 'Time desmanchado: os jogadores foram sorteados pra completar o grupo incompleto da fila, e quem sobrou foi pro fim da fila.'
+         : (r.wholeBecauseClosed ? 'A fila só tem grupos completos, então o time saiu inteiro pro fim da fila.' : 'O time saiu inteiro pro fim da fila.');
+  }
+  showSummary(head, stayingPlayers.join(', '), r.challengerNames.length ? r.challengerNames.join(', ') : '',
+    colorTag(staying), r.challengerNames.length ? colorTag(leaving) : '');
+  document.getElementById('summaryNote').textContent = note;
 }
 
 function handleTie(){
-  const twoFullTeamsWaiting = state.fila.length >= state.teamSize*2;
-  if(twoFullTeamsWaiting){
-    showModalStage('bothOut');
-  } else {
-    showModalStage('tieChoice');
+  const N = state.teamSize, L = streakLimit();
+  if(state.fila.length >= N*2){ showModalStage('bothOut'); return; }
+  if(L && state.fila.length > 0){
+    const a = state.streak.A >= L-1, b = state.streak.B >= L-1;
+    if(a !== b){
+      tieLimitSide = a ? 'A' : 'B';
+      document.getElementById('tieLimitText').textContent =
+        `Empate na ${L}ª partida seguida do ${teamLabel(tieLimitSide).text}. Como não há dois times esperando, ele sai e o ${teamLabel(otherSide(tieLimitSide)).text} fica em campo.`;
+      showModalStage('tieLimit');
+      return;
+    }
   }
+  showModalStage('tieChoice');
+}
+
+let tieLimitSide = null;
+function confirmTieLimit(){
+  countGames();
+  const L = streakLimit();
+  const leaving = tieLimitSide, staying = otherSide(leaving);
+  const leavingText = teamLabel(leaving).text;
+  const stayingPlayers = teamArr(staying).slice();
+  const r = rotate(staying, leaving, breakTeamOn());
+  const note = r.mixed ? 'Time desmanchado: os jogadores foram sorteados pra completar o grupo incompleto da fila, e quem sobrou foi pro fim da fila.'
+             : (r.wholeBecauseClosed ? 'A fila só tem grupos completos, então o time saiu inteiro pro fim da fila.' : 'O time saiu inteiro pro fim da fila.');
+  showSummary(`🤝 Empate: ${leavingText} sai (${L}ª partida seguida)`, stayingPlayers.join(', '),
+    r.challengerNames.length ? r.challengerNames.join(', ') : '', colorTag(staying), r.challengerNames.length ? colorTag(leaving) : '');
+  document.getElementById('summaryNote').textContent = note;
 }
 
 function tieBothOut(){
+  countGames();
+  state.streak = {A:0, B:0};
+  state.labelOverride = {A:null, B:null};
+  const oldA = state.teamA.slice(), oldB = state.teamB.slice(), oldBColor = majorityColor(oldB);
   // both current teams go to the end of the queue, in order
   state.fila = state.fila.concat(state.teamA).concat(state.teamB);
   const newA = state.fila.slice(0, state.teamSize);
@@ -894,12 +2005,18 @@ function tieBothOut(){
   state.fila = state.fila.slice(state.teamSize*2);
   state.teamA = newA;
   state.teamB = newB;
-  showSummary('🤝 Empate — os dois times saíram', '', newA.join(', ') + ' &nbsp;×&nbsp; ' + newB.join(', '));
+  const oldAColor = majorityColor(oldA);
+  const gotA = inheritColor(newA, oldAColor, oldA.concat(oldB));
+  const gotB = inheritColor(newB, oldBColor, oldA.concat(oldB).filter(n => newA.indexOf(n) < 0));
+  if(!gotA && !gotB) fixFieldClash(newA, newB, oldBColor, oldA.concat(oldB));
+  recolorQueue();
+  showSummary('🤝 Empate — os dois times saíram', '', newA.join(', ') + ' &nbsp;×&nbsp; ' + newB.join(', '),
+    '', state.teamMode === 'cores' ? colorTag('A') + ' ×' + colorTag('B').replace(' · ', ' ') : '');
 }
 
 function tieDrawRandom(){
   const winner = Math.random() < 0.5 ? 'A' : 'B';
-  confirmWinner(winner);
+  confirmWinner(winner, true);
 }
 
 function showManualTieChoice(){
@@ -907,7 +2024,7 @@ function showManualTieChoice(){
 }
 
 function finishRotation(){
-  state.scoreA = 0;
+  state.scoreA = 0; state.scoreLog = [];
   state.scoreB = 0;
   state.timerRemaining = state.tempoPartida;
   document.getElementById('labelA').closest('.team-box').classList.remove('winner');
@@ -915,6 +2032,201 @@ function finishRotation(){
   closeModal();
   render();
 }
+
+// toda vez que a tela é redesenhada, o estado é salvo
+const _renderOriginal = render;
+render = function(){ _renderOriginal(); saveState(); };
+
+function infoTexts(){
+  const n = state.teamSize || (parseInt(document.getElementById('inputTeamSize').value) || 5);
+  return {
+    lista:['Lista de jogadores','Um nome por linha. Goleiro vai na lista de baixo e não entra no rateio.\n\nQuem sobrar do sorteio (time incompleto) vai pra fila de espera.'],
+    timeSize:['Jogadores por time','Quantos jogadores de linha formam um time, sem contar o goleiro. Esse número também define quantos entram juntos como próximo a jogar.'],
+    horas:['Quantidade de horas','Quanto tempo a quadra foi alugada, de meia em meia hora. O total do rateio é o valor da hora vezes as horas.'],
+    identificar:['Identificar times','Letras: Time A e Time B jogam e o resto espera na fila.\n\nCores de colete: cada grupo sorteado ganha uma cor e a fila fica organizada por cor. Você escolhe quais cores existem, não há ordem fixa.'],
+    cores:['Cores dos coletes','Toque nas cores na ordem dos times: a 1ª e a 2ª começam jogando, a 3ª é a próxima a jogar, a 4ª é a segunda a jogar, e assim por diante.\n\nQualquer cor, em qualquer ordem. Toque de novo numa cor pra tirar. A lista embaixo mostra o papel de cada uma.'],
+    fim:['Regra de fim de partida','Só tempo: acaba quando o cronômetro zerar.\n\nTempo + gols: acaba no que vier primeiro.\n\nSó gols: sem cronômetro, acaba quando um time chegar no número de gols.'],
+    streak:['Vitórias seguidas pra sair','Serve pra equilibrar os times. Quando um time ganha essa quantidade de partidas seguidas, ele sai e quem perdeu continua em campo. O próximo a jogar entra.\n\nNa última partida do time (a 3ª, se o limite for 3): se empatar e houver só um time esperando, ele sai do mesmo jeito. Se houver dois times esperando, saem os dois. Se não for a última partida, o empate é decidido por sorteio ou par ou ímpar.\n\nEmpate não conta como vitória. Desligado: vale a regra normal, quem perde sai.'],
+    desmanchar:['Desmanchar o time que sai','Só vale quando um time sai por ter batido o limite de vitórias seguidas.\n\nNão: o time vai inteiro pro fim da fila, na mesma ordem.\n\nSim: se na fila existe um grupo incompleto, os jogadores do time que saiu são embaralhados pra completar esse grupo, e quem sobrar vai pro fim da fila. Se todos os grupos da fila estão completos, o time sai inteiro mesmo assim, pra não bagunçar os outros.'],
+    ordem:['Ordem dos times','Mostra quem está em campo e quem é o próximo e o segundo a jogar, com a cor de cada colete.\n\nToque na cor de um grupo pra trocar o colete de todos dele. Pra um jogador só, toque na bolinha ao lado do nome.'],
+    campo:['Em campo agora','✕ remove quem saiu da pelada (some também do rateio). O primeiro da fila entra no lugar e já veste o colete do time.'],
+    fila:['Fila de espera',`Os ${n} primeiros formam o próximo a jogar, os ${n} seguintes o segundo a jogar, e assim por diante.\n\nPra mudar alguém de posição, segure o nome por um instante e arraste até o lugar combinado.\n\n⤵ passa a vez: o jogador vai pro fim da fila, quem vem logo atrás sobe e passa a vestir o colete do grupo dele. O aviso mostra quem mudou de cor.\n\n✕ remove quem foi embora.`],
+    adicionar:['Adicionar jogador','Quem chega entra no fim da fila, veste o colete do grupo que ainda está incompleto e já conta no rateio. Se não houver grupo incompleto, começa um grupo novo com a próxima cor livre.'],
+    rateio:['Rateio','Total = valor da hora × horas, dividido entre os jogadores de linha. Acompanha quem entra ou sai. Goleiros não pagam. O valor por pessoa é arredondado pra cima, no centavo.'],
+    receber:['Como receber','Chave Pix: escolha o tipo e digite a chave.\n\nQR Code: no app do banco gere o QR Code, toque em copiar código (Pix Copia e Cola) e cole aqui.'],
+    mensagem:['Mensagem pro WhatsApp','Já vai com o valor por pessoa, o Pix e a lista de jogadores com ⬜. No grupo, cada um troca por ✅ quando pagar.']
+  };
+}
+function info(key){
+  const t = infoTexts()[key];
+  if(!t) return;
+  document.getElementById('infoTitle').textContent = t[0];
+  document.getElementById('infoText').textContent = t[1];
+  document.getElementById('infoOverlay').classList.add('show');
+}
+function closeInfo(){ document.getElementById('infoOverlay').classList.remove('show'); }
+document.addEventListener('keydown', e => { if((e.key==='Enter'||e.key===' ') && e.target.classList && e.target.classList.contains('info-btn')){ e.preventDefault(); e.target.click(); } });
+
+/* ---------- ARRASTAR JOGADOR NA FILA (segura o nome e arrasta) ---------- */
+let dnd = null;
+
+function initQueueDnd(){
+  const list = document.getElementById('filaList');
+  list.addEventListener('pointerdown', onQDown);
+  list.addEventListener('contextmenu', e => { if(e.target.closest('.slot[data-idx]')) e.preventDefault(); });
+  // com o dedo arrastando, a página não pode rolar
+  document.addEventListener('touchmove', e => { if(dnd && dnd.active) e.preventDefault(); }, {passive:false});
+}
+
+function onQDown(e){
+  if(e.pointerType === 'mouse' && e.button !== 0) return;
+  if(e.target.closest('button') || e.target.closest('.pdot')) return;
+  const slot = e.target.closest('.slot[data-idx]');
+  if(!slot || dnd) return;
+  dnd = {slot, idx:+slot.dataset.idx, sx:e.clientX, sy:e.clientY, x:e.clientX, y:e.clientY, active:false, timer:null, raf:null, clone:null, offY:0, pos:+slot.dataset.idx};
+  dnd.timer = setTimeout(startQDrag, 320);
+  window.addEventListener('pointermove', onQMove);
+  window.addEventListener('pointerup', onQUp);
+  window.addEventListener('pointercancel', onQCancel);
+}
+
+function startQDrag(){
+  if(!dnd) return;
+  dnd.active = true;
+  const r = dnd.slot.getBoundingClientRect();
+  dnd.offY = dnd.y - r.top;
+  const c = dnd.slot.cloneNode(true);
+  c.classList.add('dnd-clone');
+  c.style.width = r.width + 'px';
+  c.style.left = r.left + 'px';
+  c.style.top = r.top + 'px';
+  document.body.appendChild(c);
+  dnd.clone = c;
+  dnd.slot.classList.add('dnd-origin');
+  document.body.classList.add('dnd-on');
+  try{ navigator.vibrate && navigator.vibrate(15); }catch(_){}
+  const loop = () => {
+    if(!dnd || !dnd.active) return;
+    if(dnd.y < 90) window.scrollBy(0, -14);
+    else if(dnd.y > window.innerHeight - 120) window.scrollBy(0, 14);
+    updateQTarget();
+    dnd.raf = requestAnimationFrame(loop);
+  };
+  loop();
+}
+
+function updateQTarget(){
+  const slots = [...document.querySelectorAll('#filaList .slot[data-idx]')];
+  slots.forEach(el => el.classList.remove('drop-before','drop-after'));
+  let pos = 0;
+  slots.forEach(el => { const r = el.getBoundingClientRect(); if(r.top + r.height/2 < dnd.y) pos++; });
+  dnd.pos = pos;
+  if(pos < slots.length) slots[pos].classList.add('drop-before'); else slots[slots.length-1].classList.add('drop-after');
+  if(dnd.clone) dnd.clone.style.top = (dnd.y - dnd.offY) + 'px';
+}
+
+function onQMove(e){
+  if(!dnd) return;
+  dnd.x = e.clientX; dnd.y = e.clientY;
+  if(!dnd.active && Math.hypot(dnd.x - dnd.sx, dnd.y - dnd.sy) > 10){ endQDrag(); }
+}
+
+function onQUp(){
+  if(!dnd) return;
+  const wasActive = dnd.active, from = dnd.idx, pos = dnd.pos;
+  endQDrag();
+  if(wasActive){
+    const to = pos > from ? pos - 1 : pos;
+    if(to !== from) moveInQueue(from, to);
+  }
+}
+
+function onQCancel(){ endQDrag(); }
+
+function endQDrag(){
+  if(!dnd) return;
+  clearTimeout(dnd.timer);
+  if(dnd.raf) cancelAnimationFrame(dnd.raf);
+  if(dnd.clone) dnd.clone.remove();
+  dnd.slot.classList.remove('dnd-origin');
+  document.querySelectorAll('#filaList .slot').forEach(el => el.classList.remove('drop-before','drop-after'));
+  document.body.classList.remove('dnd-on');
+  window.removeEventListener('pointermove', onQMove);
+  window.removeEventListener('pointerup', onQUp);
+  window.removeEventListener('pointercancel', onQCancel);
+  dnd = null;
+}
+
+function wrapSelectStepper(id){
+  const sel = document.getElementById(id);
+  const wrap = document.createElement('div');
+  wrap.className = 'num-wrap';
+  sel.parentNode.insertBefore(wrap, sel);
+  wrap.appendChild(sel);
+  const st = document.createElement('div');
+  st.className = 'stepper';
+  st.innerHTML = '<button type="button" class="step-btn" aria-label="Diminuir">−</button><button type="button" class="step-btn" aria-label="Aumentar">+</button>';
+  wrap.appendChild(st);
+  const [minus, plus] = st.querySelectorAll('button');
+  const go = (d) => {
+    const i = Math.min(sel.options.length-1, Math.max(0, sel.selectedIndex + d));
+    sel.selectedIndex = i;
+    sel.dispatchEvent(new Event('change', {bubbles:true}));
+  };
+  minus.onclick = () => go(-1);
+  plus.onclick = () => go(1);
+}
+
+function wrapNumber(input){
+  const wrap = document.createElement('div');
+  wrap.className = 'num-wrap';
+  input.parentNode.insertBefore(wrap, input);
+  wrap.appendChild(input);
+  const st = document.createElement('div');
+  st.className = 'stepper';
+  st.innerHTML = '<button type="button" class="step-btn" aria-label="Diminuir">−</button><button type="button" class="step-btn" aria-label="Aumentar">+</button>';
+  wrap.appendChild(st);
+  const [minus, plus] = st.querySelectorAll('button');
+  const step = (dir) => {
+    const stp = parseFloat(input.dataset.step) || 1;
+    const min = input.min !== '' ? parseFloat(input.min) : -Infinity;
+    let v = (parseFloat(input.value) || 0) + dir*stp;
+    if(v < min) v = min;
+    input.value = Math.round(v*100)/100;
+    input.dispatchEvent(new Event('input', {bubbles:true}));
+  };
+  minus.onclick = () => step(-1);
+  plus.onclick = () => step(1);
+}
+document.getElementById('inputValorHora').dataset.step = 5;
+document.querySelectorAll('input[type=number]').forEach(wrapNumber);
+fillHoras();
+initQueueDnd();
+wrapSelectStepper('inputStreakLimit');
+wrapSelectStepper('inputHoras');
+wrapSelectStepper('rtHoras');
+const boot = restoreState();
+document.querySelectorAll('textarea').forEach(autoGrow);
+renderColorPicker();
+toggleTeamModeFields();
+toggleStreakFields();
+toggleEndModeFields();
+updatePixUI();
+document.getElementById('rtHoras').value = document.getElementById('inputHoras').value;
+applyTimerVisibility();
+render();
+showTab(boot.tab);
+if(state.started && boot.wasRunning && state.timerEndAt){
+  // retoma: o tempo que passou com o app fechado já é descontado pelo timestamp
+  state.timerRunning = true;
+  state.timerInterval = setInterval(syncTimer, 250);
+  document.getElementById('timerStartBtn').textContent = 'Pausar';
+  requestWakeLock();
+  syncTimer();
+} else {
+  state.timerEndAt = null;
+}
+if(state.started) checkGoalRule();
 </script>
 <script>
   if ('serviceWorker' in navigator) {
