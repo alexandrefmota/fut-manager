@@ -1928,6 +1928,43 @@ function rotate(stayingSide, leavingSide, dismantle){
   return {challengerNames, mixed, wholeBecauseClosed: dismantle && !mixed};
 }
 
+// vitória no limite com 2 times de fora (ou 1 completo + 1 incompleto): sai o vencedor E o perdedor
+function limitBothOut(winner, head){
+  const N = state.teamSize, f = state.fila.length;
+  const loserSide = otherSide(winner);
+  const W = teamArr(winner).slice(), Lo = teamArr(loserSide).slice();
+  const wc = majorityColor(W), lc = majorityColor(Lo);
+  let newA, newB, note;
+  if(f >= N*2){
+    state.fila = state.fila.concat(Lo, W);          // perdedor e depois o vencedor, na ordem do time
+    newA = state.fila.slice(0, N); newB = state.fila.slice(N, N*2);
+    state.fila = state.fila.slice(N*2);
+    inheritColor(newA, lc, Lo.concat(W));
+    inheritColor(newB, wc, Lo.concat(W).filter(n => newA.indexOf(n) < 0));
+    note = 'Saíram o time que fez as ' + streakLimit() + ' vitórias seguidas e o que perdeu. Entram os dois próximos times da fila.';
+  } else {
+    const rem = state.fila.slice(N);                 // time incompleto
+    const need = N - rem.length;
+    newA = state.fila.slice(0, N);                   // time completo
+    newB = rem.concat(Lo.slice(0, need));            // incompleto + jogadores do time que perdeu (na ordem)
+    const sobra = Lo.slice(need);
+    state.fila = sobra.concat(W);                    // quem sobrou do perdedor vira o próximo, completado pelo time que saiu
+    inheritColor(newA, wc, W);
+    const remColor = state.tags[rem[0]] || null;
+    const c2 = remColor || lc;
+    if(c2) newB.forEach(n => { state.tags[n] = c2; });
+    if(!remColor && lc) sobra.forEach(n => { delete state.tags[n]; });   // sem cor sobrando: o colete do perdedor passou pro novo time
+    note = `Saíram o time que fez as ${streakLimit()} vitórias seguidas e o que perdeu. Entra o time completo da fila, e o time incompleto foi completado com ${need} jogador(es) do time que perdeu, na ordem do time. Quem sobrou do time que perdeu é o próximo a jogar, completado pelo time que saiu.`;
+  }
+  state.teamA = newA; state.teamB = newB;
+  state.streak = {A:0, B:0};
+  state.labelOverride = {A:null, B:null};
+  recolorQueue();
+  showSummary(head, '', newA.join(', ') + ' &nbsp;×&nbsp; ' + newB.join(', '), '',
+    state.teamMode === 'cores' ? colorTag('A') + ' ×' + colorTag('B').replace(' · ', ' ') : '');
+  document.getElementById('summaryNote').textContent = note;
+}
+
 function confirmWinner(winner, byTie){
   countGames();
   const L = streakLimit();
@@ -1942,6 +1979,10 @@ function confirmWinner(winner, byTie){
   if(!byTie){
     state.streak[winner] += 1;   // desempate (sorteio/par ou ímpar) não soma vitória
     if(L && state.streak[winner] >= L){
+      if(state.fila.length > state.teamSize && state.fila.length < state.teamSize*2 || state.fila.length >= state.teamSize*2){
+        limitBothOut(winner, `🏆 ${winnerText} venceu a ${L}ª seguida e sai!`);
+        return;
+      }
       if(state.fila.length > 0){
         staying = loserSide; leaving = winner; dismantle = breakTeamOn();
         state.streak[loserSide] = 0;   // quem fica em campo recomeça do zero
@@ -2046,7 +2087,7 @@ function infoTexts(){
     identificar:['Identificar times','Letras: Time A e Time B jogam e o resto espera na fila.\n\nCores de colete: cada grupo sorteado ganha uma cor e a fila fica organizada por cor. Você escolhe quais cores existem, não há ordem fixa.'],
     cores:['Cores dos coletes','Toque nas cores na ordem dos times: a 1ª e a 2ª começam jogando, a 3ª é a próxima a jogar, a 4ª é a segunda a jogar, e assim por diante.\n\nQualquer cor, em qualquer ordem. Toque de novo numa cor pra tirar. A lista embaixo mostra o papel de cada uma.'],
     fim:['Regra de fim de partida','Só tempo: acaba quando o cronômetro zerar.\n\nTempo + gols: acaba no que vier primeiro.\n\nSó gols: sem cronômetro, acaba quando um time chegar no número de gols.'],
-    streak:['Vitórias seguidas pra sair','Serve pra equilibrar os times. Quando um time ganha essa quantidade de partidas seguidas, ele sai e quem perdeu continua em campo. O próximo a jogar entra.\n\nNa última partida do time (a 3ª, se o limite for 3): se empatar e houver só um time esperando, ele sai do mesmo jeito. Se houver dois times esperando, saem os dois. Se não for a última partida, o empate é decidido por sorteio ou par ou ímpar.\n\nEmpate não conta como vitória. Desligado: vale a regra normal, quem perde sai.'],
+    streak:['Vitórias seguidas pra sair','Serve pra equilibrar os times. Quando um time ganha essa quantidade de partidas seguidas, ele sai e quem perdeu continua em campo. O próximo a jogar entra.\n\nNa última partida do time (a 3ª, se o limite for 3): se empatar e houver só um time esperando, ele sai do mesmo jeito. Se houver dois times esperando, saem os dois. Se não for a última partida, o empate é decidido por sorteio ou par ou ímpar.\n\nQuando o time bate o limite e há 2 times esperando, saem o vencedor e o perdedor. Se a fila tem 1 time completo e 1 incompleto, entra o completo e o incompleto é fechado com jogadores do time que perdeu.\n\nEmpate não conta como vitória. Desligado: vale a regra normal, quem perde sai.'],
     desmanchar:['Desmanchar o time que sai','Só vale quando um time sai por ter batido o limite de vitórias seguidas.\n\nNão: o time vai inteiro pro fim da fila, na mesma ordem.\n\nSim: se na fila existe um grupo incompleto, os jogadores do time que saiu são embaralhados pra completar esse grupo, e quem sobrar vai pro fim da fila. Se todos os grupos da fila estão completos, o time sai inteiro mesmo assim, pra não bagunçar os outros.'],
     ordem:['Ordem dos times','Mostra quem está em campo e quem é o próximo e o segundo a jogar, com a cor de cada colete.\n\nToque na cor de um grupo pra trocar o colete de todos dele. Pra um jogador só, toque na bolinha ao lado do nome.'],
     campo:['Em campo agora','✕ remove quem saiu da pelada (some também do rateio). O primeiro da fila entra no lugar e já veste o colete do time.'],
